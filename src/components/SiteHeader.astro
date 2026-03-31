@@ -1,0 +1,250 @@
+---
+import { navigation } from "@data/navigation";
+import { profile } from "@data/profile";
+
+const currentPath = Astro.url.pathname;
+const initials = profile.name
+  .split(" ")
+  .filter(Boolean)
+  .map((part) => part[0]?.toUpperCase())
+  .slice(0, 2)
+  .join(" / ");
+---
+
+<header class="site-header">
+  <div class="container inner">
+    <a class="brand" href="/">
+      <span class="monogram" aria-hidden="true">{initials}</span>
+      <span class="label">
+        <strong>{profile.name}</strong>
+        <span>{profile.roleLabel}</span>
+      </span>
+    </a>
+
+    <nav class="desktop-nav" aria-label="Hlavní navigace">
+      {navigation.map((item) => {
+        const active =
+          item.href === "/"
+            ? currentPath === item.href
+            : item.href.startsWith("/#")
+              ? currentPath === "/"
+              : currentPath.startsWith(item.href);
+
+        return (
+          <a class:list={["nav-link", active && "active"]} href={item.href}>
+            {item.label}
+          </a>
+        );
+      })}
+    </nav>
+
+    <details class="mobile-nav">
+      <summary>Menu</summary>
+      <nav aria-label="Mobilní navigace">
+        {navigation.map((item) => (
+          <a href={item.href}>{item.label}</a>
+        ))}
+      </nav>
+    </details>
+  </div>
+</header>
+
+<script>
+  function initMobileNav() {
+    const mobileNav = document.querySelector(".mobile-nav");
+    if (!mobileNav || mobileNav.dataset.bound === "true") {
+      return;
+    }
+
+    const mobileLinks = mobileNav?.querySelectorAll("a");
+    mobileNav.dataset.bound = "true";
+
+    mobileLinks?.forEach((link) => {
+      link.addEventListener("click", () => {
+        mobileNav?.removeAttribute("open");
+      });
+    });
+  }
+
+  initMobileNav();
+  document.addEventListener("astro:page-load", initMobileNav);
+</script>
+
+<style>
+  .site-header {
+    position: sticky;
+    top: 0;
+    z-index: 20;
+    padding: 0.8rem 0;
+    backdrop-filter: blur(18px);
+    background: linear-gradient(180deg, rgba(9, 9, 9, 0.88), rgba(9, 9, 9, 0.55));
+    border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  .inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    min-width: 0;
+  }
+
+  .brand {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.9rem;
+    min-width: 0;
+    flex: 0 1 auto;
+  }
+
+  .monogram {
+    display: grid;
+    place-items: center;
+    width: 3rem;
+    aspect-ratio: 1;
+    border-radius: 0.8rem;
+    background: var(--color-accent);
+    color: var(--color-accent-ink);
+    font-family: var(--font-display);
+    font-weight: 900;
+  }
+
+  .label {
+    display: grid;
+    min-width: 0;
+  }
+
+  .label strong,
+  .label span {
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .label strong {
+    font-size: 0.95rem;
+  }
+
+  .label span {
+    color: var(--color-text-soft);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.68rem;
+  }
+
+  .desktop-nav {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.3rem;
+    padding: 0.28rem;
+    border: 1px solid rgba(245, 209, 13, 0.18);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03);
+    box-shadow:
+      inset 0 1px 0 rgba(255, 255, 255, 0.04),
+      0 0 0 1px rgba(255, 255, 255, 0.02);
+    min-width: 0;
+  }
+
+  .nav-link {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.6rem;
+    padding: 0.6rem 1rem;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-muted);
+    transition:
+      transform var(--duration-fast) var(--easing),
+      background-color var(--duration-fast) var(--easing),
+      box-shadow var(--duration-fast) var(--easing),
+      color var(--duration-fast) var(--easing);
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible,
+  .nav-link.active {
+    background: rgba(245, 209, 13, 0.14);
+    color: var(--color-text);
+    box-shadow: inset 0 0 0 1px rgba(245, 209, 13, 0.22);
+  }
+
+  .nav-link:hover,
+  .nav-link:focus-visible {
+    transform: translateY(-1px);
+  }
+
+  .mobile-nav {
+    display: none;
+    position: relative;
+  }
+
+  .mobile-nav summary {
+    list-style: none;
+    cursor: pointer;
+    padding: 0.7rem 0.95rem;
+    border: 1px solid rgba(245, 209, 13, 0.24);
+    border-radius: 999px;
+    background: rgba(255, 255, 255, 0.03);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.76rem;
+  }
+
+  .mobile-nav[open] nav {
+    position: absolute;
+    right: 0;
+    top: calc(100% + 0.6rem);
+    min-width: 220px;
+    padding: 0.6rem;
+    border-radius: 1rem;
+    border: 1px solid rgba(245, 209, 13, 0.2);
+    background: rgba(9, 9, 9, 0.96);
+    display: grid;
+    gap: 0.3rem;
+  }
+
+  .mobile-nav nav a {
+    padding: 0.8rem;
+    border-radius: 0.7rem;
+  }
+
+  .mobile-nav nav a:hover,
+  .mobile-nav nav a:focus-visible {
+    background: rgba(245, 209, 13, 0.12);
+  }
+
+  @media (max-width: 920px) {
+    .desktop-nav {
+      display: none;
+    }
+
+    .mobile-nav {
+      display: block;
+    }
+  }
+
+  @media (max-width: 1120px) {
+    .label span {
+      display: none;
+    }
+
+    .nav-link {
+      min-height: 2.45rem;
+      padding: 0.55rem 0.8rem;
+      font-size: 0.76rem;
+    }
+  }
+
+  @media (max-width: 580px) {
+    .label strong {
+      font-size: 0.88rem;
+    }
+  }
+</style>

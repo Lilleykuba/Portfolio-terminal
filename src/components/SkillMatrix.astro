@@ -1,0 +1,101 @@
+---
+import { levelLabels, skillGroups } from "@data/skills";
+---
+
+<div class="matrix">
+  {skillGroups.map((group) => (
+    <article class="skill-group surface" data-reveal>
+      <header>
+        <h3>{group.title}</h3>
+        <p>{group.description}</p>
+      </header>
+      <ul>
+        {group.items.map((item) => (
+          <li>
+            <div class="line">
+              <strong>{item.name}</strong>
+              <span class:list={["level", item.level]}>{levelLabels[item.level]}</span>
+            </div>
+            <p>{item.note}</p>
+          </li>
+        ))}
+      </ul>
+    </article>
+  ))}
+</div>
+
+<style>
+  .matrix {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1rem;
+  }
+
+  .skill-group {
+    padding: 1.3rem;
+    display: grid;
+    gap: 1.2rem;
+  }
+
+  header {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
+  }
+
+  header p,
+  li p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  li {
+    display: grid;
+    gap: 0.35rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .line {
+    display: flex;
+    gap: 0.8rem;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .level {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+
+  .level.silne {
+    color: var(--color-accent);
+  }
+
+  .level.prakticky {
+    color: var(--color-text);
+  }
+
+  .level.rozvijim {
+    color: #e2bd00;
+  }
+</style>

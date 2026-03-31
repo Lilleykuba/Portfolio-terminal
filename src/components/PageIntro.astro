@@ -1,0 +1,61 @@
+---
+interface Props {
+  eyebrow: string;
+  title: string;
+  text: string;
+  sideLabel?: string;
+}
+
+const { eyebrow, title, text, sideLabel } = Astro.props;
+---
+
+<section class="page-intro section">
+  <div class="container intro-grid">
+    <div class="copy" data-reveal>
+      <span class="eyebrow">{eyebrow}</span>
+      <h1 class="heading-lg">{title}</h1>
+      <p class="lede">{text}</p>
+    </div>
+    {sideLabel && (
+      <div class="side surface" data-reveal>
+        <span>{sideLabel}</span>
+      </div>
+    )}
+  </div>
+</section>
+
+<style>
+  .page-intro {
+    padding-top: 2rem;
+  }
+
+  .intro-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(180px, 260px);
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .copy {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .side {
+    min-height: 100%;
+    padding: 1.25rem;
+    display: grid;
+    place-items: end start;
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-size: 0.82rem;
+  }
+
+  @media (max-width: 800px) {
+    .intro-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

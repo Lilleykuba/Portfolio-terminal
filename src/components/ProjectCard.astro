@@ -1,0 +1,231 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import { projectCategoryMeta } from "@lib/content";
+
+interface Props {
+  project: CollectionEntry<"projects">;
+  featured?: boolean;
+}
+
+const { project, featured = false } = Astro.props;
+const previewStack = project.data.stack.slice(0, 2).join(" / ");
+const categoryLabel = projectCategoryMeta[project.data.category].label;
+const tagsLine = project.data.tags.slice(0, 3).join(" / ");
+---
+
+<article
+  class:list={["project-card", "surface", featured && "featured"]}
+  data-reveal
+>
+  <div class="frame" aria-hidden="true">
+    <span>project / {project.data.year}</span>
+    <strong>{previewStack}</strong>
+  </div>
+  <div class="topline">
+    <span class="category">{categoryLabel}</span>
+    <span class="status">{project.data.status}</span>
+  </div>
+  <div class="copy">
+    <h3><a href={`/projekty/${project.id}/`}>{project.data.title}</a></h3>
+    <p>{project.data.summary}</p>
+  </div>
+  <dl class="specs" aria-label="Detaily projektu">
+    <div>
+      <dt>Role</dt>
+      <dd>{project.data.role}</dd>
+    </div>
+    <div>
+      <dt>Stack</dt>
+      <dd>{project.data.stack.join(" / ")}</dd>
+    </div>
+  </dl>
+  <div class="bottom">
+    <p class="tags">{tagsLine}</p>
+    <div class="actions">
+      {project.data.github && (
+        <a class="mini-link" href={project.data.github} target="_blank" rel="noreferrer">
+          GitHub
+        </a>
+      )}
+      {project.data.demo && (
+        <a class="mini-link strong" href={project.data.demo} target="_blank" rel="noreferrer">
+          Ukázka
+        </a>
+      )}
+      <a class="detail-link" href={`/projekty/${project.id}/`}>
+        Detail
+      </a>
+    </div>
+  </div>
+</article>
+
+<style>
+  .project-card {
+    display: grid;
+    gap: 1rem;
+    padding: 1.2rem;
+    min-height: 100%;
+  }
+
+  .frame {
+    display: grid;
+    gap: 0.28rem;
+    padding: 0.8rem 0.95rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(245, 209, 13, 0.16);
+    background:
+      linear-gradient(135deg, rgba(245, 209, 13, 0.08), transparent 58%),
+      rgba(255, 255, 255, 0.02);
+  }
+
+  .frame span,
+  .category,
+  .status,
+  dt,
+  .mini-link,
+  .tags {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.72rem;
+  }
+
+  .frame span,
+  .category,
+  dt,
+  .tags,
+  .mini-link {
+    color: var(--color-text-soft);
+  }
+
+  .frame strong {
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.02em;
+    line-height: 1;
+    font-size: 1rem;
+  }
+
+  .project-card.featured {
+    background:
+      linear-gradient(135deg, rgba(245, 209, 13, 0.08), transparent 42%),
+      var(--color-panel-alt);
+  }
+
+  .topline,
+  .bottom {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .status {
+    color: var(--color-accent);
+  }
+
+  .copy {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
+    font-size: clamp(1.35rem, 2vw, 1.9rem);
+  }
+
+  h3 a {
+    transition: color var(--duration-fast) var(--easing);
+  }
+
+  h3 a:hover,
+  h3 a:focus-visible {
+    color: var(--color-accent);
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .specs {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0.7rem;
+    margin: 0;
+  }
+
+  .specs div {
+    display: grid;
+    gap: 0.2rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  dt,
+  dd {
+    margin: 0;
+  }
+
+  dd {
+    font-size: 0.95rem;
+    line-height: 1.35;
+  }
+
+  .tags {
+    margin: 0;
+  }
+
+  .actions {
+    display: flex;
+    align-items: center;
+    gap: 0.8rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .mini-link {
+    transition: color var(--duration-fast) var(--easing);
+  }
+
+  .mini-link:hover,
+  .mini-link:focus-visible {
+    color: var(--color-accent);
+  }
+
+  .mini-link.strong {
+    color: var(--color-accent);
+  }
+
+  .detail-link {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    font-weight: 700;
+  }
+
+  .detail-link::after {
+    content: "→";
+    transition: transform var(--duration-fast) var(--easing);
+  }
+
+  .detail-link:hover::after,
+  .detail-link:focus-visible::after {
+    transform: translateX(4px);
+  }
+
+  @media (max-width: 620px) {
+    .bottom {
+      align-items: start;
+    }
+
+    .actions {
+      justify-content: flex-start;
+    }
+  }
+</style>

@@ -1,0 +1,29 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+---
+
+<BaseLayout title="Stránka nenalezena | Portfolio" description="Požadovaná stránka v portfoliu neexistuje." noIndex={true}>
+  <section class="section">
+    <div class="container not-found surface" data-reveal>
+      <span class="eyebrow">404</span>
+      <h1 class="heading-lg">Tady už nic není.</h1>
+      <p class="lede">
+        Zkuste návrat na domovskou stránku nebo rovnou otevřít hlavní terminal.
+        Struktura webu je teď záměrně jednoduchá a většina důležitých cest vede odtud.
+      </p>
+      <div class="button-row">
+        <a class="button button-primary" href="/">Domů</a>
+        <a class="button button-secondary" href="/#terminal">Terminal</a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .not-found {
+    padding: 1.5rem;
+    display: grid;
+    gap: 1rem;
+    max-width: 760px;
+  }
+</style>

@@ -1,0 +1,832 @@
+---
+import { certificates } from "@data/certificates";
+import { profile } from "@data/profile";
+import { skillGroups } from "@data/skills";
+import { documents } from "@data/site";
+import { socialLinks } from "@data/socials";
+import { getFeaturedProjects, projectCategoryMeta } from "@lib/content";
+
+const featuredProjects = await getFeaturedProjects();
+const emailLink = socialLinks.find((link) => link.label === "E-mail" && link.available && link.href);
+const cvHref = documents.cvHref || emailLink?.href || "/#terminal-contact";
+const contactLinks = socialLinks.filter(
+  (link) => link.label !== "CV" && link.available && link.href,
+);
+const certificateLinks = certificates
+  .filter((certificate) => certificate.href)
+  .map((certificate) => ({
+    label: `open ${certificate.title.toLowerCase()} / certifikat`,
+    href: certificate.href!,
+    external: true,
+  }));
+
+const views = {
+  summary: {
+    command: "summary",
+    title: "Rychlý profil",
+    subtitle: "Rychlý scan profilu během několika sekund.",
+    lines: [
+      "+----------------------------------------------------------+",
+      "| JAKUB / QUICK SUMMARY                                    |",
+      "+----------------------------------------------------------+",
+      ` role        : ${profile.roleLabel}`,
+      ` location    : ${profile.location}`,
+      " fit         : junior web / cybersecurity / HRIT role",
+      ` stack       : ${profile.coreStack.slice(0, 5).join(", ")}`,
+      ` growth      : ${profile.currentLearning[0]}`,
+      "",
+      ` note        : ${profile.recruiterSummary}`,
+    ],
+    actions: [],
+  },
+  stack: {
+    command: "stack",
+    title: "Core Stack",
+    subtitle: "Technologie, na kterých stojí můj aktuální směr.",
+    lines: [
+      "+----------------------------------------------------------+",
+      "| STACK                                                    |",
+      "+----------------------------------------------------------+",
+      ` core        : ${profile.coreStack.join(", ")}`,
+      ` learning    : ${profile.currentLearning.join(" | ")}`,
+    ],
+    actions: [],
+  },
+  skills: {
+    command: "skills",
+    title: "Dovednosti",
+    subtitle: "Hlavní oblasti, ve kterých se pohybuji.",
+    lines: [
+      "+----------------------------------------------------------+",
+      "| SKILLS                                                   |",
+      "+----------------------------------------------------------+",
+      ...skillGroups.flatMap((group) => [
+        `[${group.title}]`,
+        ...group.items.slice(0, 4).map((item) => ` - ${item.name}: ${item.note}`),
+        "",
+      ]),
+    ],
+    actions: [],
+  },
+  projects: {
+    command: "projects",
+    title: "Projekty",
+    subtitle: "Vybrané projekty a rychlé akce uvnitř terminalu.",
+    lines: [
+      "+----------------------------------------------------------+",
+      "| PROJECTS                                                 |",
+      "+----------------------------------------------------------+",
+      ...featuredProjects.flatMap((project, index) => [
+        `${String(index + 1).padStart(2, "0")} ${project.data.title}  [${project.data.year}]`,
+        `   ${projectCategoryMeta[project.data.category].label} / ${project.data.stack.slice(0, 2).join(" + ")}`,
+        `   ${project.data.summary.length > 92 ? `${project.data.summary.slice(0, 89)}...` : project.data.summary}`,
+        "",
+      ]),
+    ],
+    actions: featuredProjects.flatMap((project) => [
+      {
+        label: `open ${project.id} / detail`,
+        href: `/projekty/${project.id}/`,
+        external: false,
+      },
+      ...(project.data.github
+        ? [
+            {
+              label: `open ${project.id} / github`,
+              href: project.data.github,
+              external: true,
+            },
+          ]
+        : []),
+      ...(project.data.demo
+        ? [
+            {
+              label: `open ${project.id} / ukazka`,
+              href: project.data.demo,
+              external: true,
+            },
+          ]
+        : []),
+    ]),
+  },
+  certs: {
+    command: "certs",
+    title: "Certifikáty",
+    subtitle: "Dokončené nebo rozpracované certifikace.",
+    lines: [
+      "+----------------------------------------------------------+",
+      "| CERTIFICATES                                             |",
+      "+----------------------------------------------------------+",
+      ...(certificates.length
+        ? certificates.flatMap((certificate, index) => [
+            `${String(index + 1).padStart(2, "0")} ${certificate.title}`,
+            `   ${certificate.issuer} / ${certificate.year}`,
+            `   status: ${certificate.status}`,
+            "",
+          ])
+        : [
+            " status      : zatim bez verejne uvedenych certifikatu",
+            " note        : prostor pripraveny pro dokoncene i",
+            "               rozpracovane certifikace",
+          ]),
+    ],
+    actions: certificateLinks,
+  },
+  contact: {
+    command: "contact",
+    title: "Contact",
+    subtitle: "Kontaktní cesty přímo v terminálu.",
+    lines: [
+      "+----------------------------------------------------------+",
+      "| CONTACT                                                  |",
+      "+----------------------------------------------------------+",
+      " prefer      : kratky e-mail nebo LinkedIn zprava",
+    ],
+    actions: contactLinks.map((link) => ({
+      label: `${link.label.toLowerCase()} / ${link.handle}`,
+      href: link.href,
+      external: Boolean(link.external),
+    })),
+  },
+  cv: {
+    command: "cv",
+    title: "CV",
+    subtitle: "Status CV a rychlá akce v TTY stylu.",
+    lines: [
+      "+----------------------------------------------------------+",
+      "| CV                                                       |",
+      "+----------------------------------------------------------+",
+      ` status      : ${documents.cvHref ? "pripraveno ke stazeni" : "na vyzadani"}`,
+    ],
+    actions: [
+      {
+        label: documents.cvHref ? "open cv" : "request cv",
+        href: cvHref,
+        external: Boolean(documents.cvHref),
+      },
+    ],
+  },
+  help: {
+    command: "help",
+    title: "Nápověda",
+    subtitle: "Přehled dostupných příkazů.",
+    lines: [
+      "+----------------------------------------------------------+",
+      "| HELP                                                     |",
+      "+----------------------------------------------------------+",
+      " commands    : summary, stack, skills, projects, certs, contact, cv",
+      " aliases     : profile -> summary, whoami -> summary",
+      "             : certificates -> certs, mail -> contact",
+      "             : resume -> cv",
+      " tip         : napis prikaz nebo klikni na shortcut",
+    ],
+    actions: [],
+  },
+};
+
+const bootLines = [
+  "[ boot ] loading profile context...",
+  "[ boot ] indexing selected projects...",
+  "[ boot ] mapping contact channels...",
+  "[ boot ] terminal ready",
+];
+---
+
+<section class="mega-terminal surface" data-reveal>
+  {Object.values(views)
+    .filter((view) => view.command !== "help")
+    .map((view) => (
+      <span class="terminal-anchor" id={`terminal-${view.command}`} aria-hidden="true"></span>
+    ))}
+  <div class="terminal-top">
+    <div class="window-chrome" aria-hidden="true">
+      <span></span>
+      <span></span>
+      <span></span>
+    </div>
+    <span class="terminal-path">~/jakub/portfolio-index</span>
+    <span class="terminal-state" data-terminal-state>booting</span>
+  </div>
+
+  <div class="terminal-shell">
+    <aside class="terminal-sidebar">
+      <p class="sidebar-label">prikazy</p>
+      <div class="shortcut-row" aria-label="Rychlé příkazy">
+        {Object.values(views)
+          .filter((view) => view.command !== "help")
+          .map((view) => (
+            <button
+              class="shortcut"
+              type="button"
+              data-terminal-shortcut={view.command}
+              disabled
+            >
+              {view.command}
+            </button>
+          ))}
+      </div>
+      <p class="sidebar-help">
+        Jeden screen, jeden příkaz. Zkus <code>help</code>.
+      </p>
+    </aside>
+
+    <div class="terminal-main">
+      <article class="terminal-screen">
+        <header class="screen-head">
+          <div>
+            <p class="screen-title" data-terminal-title>Boot Sequence</p>
+            <p class="screen-subtitle" data-terminal-subtitle>
+              Spouštím terminal a připravuji rychlý profil.
+            </p>
+          </div>
+          <span class="screen-command" data-terminal-command>$ boot</span>
+        </header>
+
+        <div class="tty-output">
+          <div class="tty-text is-booting" data-terminal-output>{bootLines[0]}</div>
+        </div>
+      </article>
+
+      <p class="terminal-status" id="terminal-status" data-terminal-status>
+        Terminal se spousti...
+      </p>
+
+      <form class="terminal-input" data-terminal-form>
+        <label class="sr-only" for="terminal-command">Terminal command</label>
+        <span class="prompt-label">guest@jakub:~$</span>
+        <input
+          id="terminal-command"
+          name="command"
+          type="text"
+          value="summary"
+          autocomplete="off"
+          spellcheck="false"
+          aria-describedby="terminal-status"
+          data-terminal-input
+          disabled
+        />
+        <button type="submit" aria-label="Spustit prikaz" disabled>
+          ↵
+        </button>
+      </form>
+    </div>
+  </div>
+</section>
+
+<script define:vars={{ views, bootLines }}>
+  function initMegaTerminal() {
+    const root = document.querySelector(".mega-terminal");
+    if (!root || root.dataset.bound === "true") return;
+    root.dataset.bound = "true";
+
+    const aliases = {
+      profile: "summary",
+      whoami: "summary",
+      certificates: "certs",
+      certificate: "certs",
+      mail: "contact",
+      email: "contact",
+      resume: "cv",
+    };
+
+    const form = root.querySelector("[data-terminal-form]");
+    const input = root.querySelector("[data-terminal-input]");
+    const button = form?.querySelector("button");
+    const status = root.querySelector("[data-terminal-status]");
+    const title = root.querySelector("[data-terminal-title]");
+    const subtitle = root.querySelector("[data-terminal-subtitle]");
+    const commandTarget = root.querySelector("[data-terminal-command]");
+    const output = root.querySelector("[data-terminal-output]");
+    const state = root.querySelector("[data-terminal-state]");
+    const shortcuts = Array.from(root.querySelectorAll("[data-terminal-shortcut]"));
+
+    const commandFromHash = () => {
+      const hash = window.location.hash.toLowerCase();
+      if (!hash.startsWith("#terminal-")) return null;
+      const candidate = hash.replace("#terminal-", "");
+      return views[candidate] ? candidate : null;
+    };
+
+    const enableTerminal = () => {
+      if (input instanceof HTMLInputElement) input.disabled = false;
+      if (button instanceof HTMLButtonElement) button.disabled = false;
+      shortcuts.forEach((shortcut) => {
+        if (shortcut instanceof HTMLButtonElement) shortcut.disabled = false;
+      });
+      if (state) state.textContent = "interactive tty";
+    };
+
+    const escapeHtml = (value) =>
+      value
+        .replaceAll("&", "&amp;")
+        .replaceAll("<", "&lt;")
+        .replaceAll(">", "&gt;");
+
+    const wrapTtyLine = (line, maxWidth = 78) => {
+      if (!line || line.length <= maxWidth) return [line];
+      if (/^[+|]/.test(line)) return [line];
+
+      const valueMatch = line.match(/^(.*?:\s)(.+)$/);
+      const indentedMatch = !valueMatch ? line.match(/^(\s+)(.+)$/) : null;
+
+      const prefix = valueMatch?.[1] ?? indentedMatch?.[1] ?? "";
+      const content = valueMatch?.[2] ?? indentedMatch?.[2] ?? line;
+      const continuationPrefix = valueMatch ? " ".repeat(prefix.length) : prefix || "";
+      const availableWidth = Math.max(maxWidth - continuationPrefix.length, 16);
+
+      const words = content.split(/\s+/).filter(Boolean);
+      if (!words.length) return [line];
+
+      const wrapped = [];
+      let current = prefix;
+
+      words.forEach((word) => {
+        const separator = current.trim() === prefix.trim() || current === prefix ? "" : " ";
+        const candidate = `${current}${separator}${word}`;
+
+        if (candidate.length <= maxWidth) {
+          current = candidate;
+          return;
+        }
+
+        if (current.trim().length > 0) {
+          wrapped.push(current);
+        }
+
+        current = `${continuationPrefix}${word}`;
+
+        while (current.length > maxWidth) {
+          wrapped.push(current.slice(0, maxWidth));
+          current = `${continuationPrefix}${current.slice(maxWidth)}`;
+        }
+      });
+
+      if (current.trim().length > 0) {
+        wrapped.push(current);
+      }
+
+      return wrapped;
+    };
+
+    const renderOutput = (view) => {
+      if (!output) return;
+
+      const textBlock = view.lines
+        .flatMap((line) => wrapTtyLine(line))
+        .map((line) => escapeHtml(line))
+        .join("\n");
+      const linkBlock = (view.actions ?? [])
+        .map(
+          (item) => `&gt; <a class="tty-inline-link" href="${item.href}" ${
+            item.external ? 'target="_blank" rel="noreferrer"' : ""
+          }>${escapeHtml(item.label)}</a>`,
+        )
+        .join("\n");
+
+      output.innerHTML = [textBlock, linkBlock].filter(Boolean).join("\n");
+      output.classList.remove("is-booting");
+    };
+
+    const render = (rawCommand, syncHash = true) => {
+      const normalized = rawCommand.trim().toLowerCase();
+      const resolved = aliases[normalized] ?? normalized;
+      const view = views[resolved] ?? views.help;
+      const isKnown = Boolean(views[resolved]);
+
+      if (input instanceof HTMLInputElement) {
+        input.value = isKnown ? view.command : normalized;
+      }
+
+      if (title) title.textContent = view.title;
+      if (subtitle) subtitle.textContent = view.subtitle;
+      if (commandTarget) {
+        commandTarget.textContent = `$ ${isKnown ? view.command : `${normalized || "help"} -> help`}`;
+      }
+      renderOutput(view);
+
+      shortcuts.forEach((shortcut) => {
+        shortcut.classList.toggle(
+          "is-active",
+          shortcut.dataset.terminalShortcut === view.command,
+        );
+      });
+
+      if (status) {
+        status.innerHTML = isKnown
+          ? `Aktivni prikaz: <strong>${view.command}</strong>`
+          : `Neznamy prikaz: <strong>${normalized || "empty"}</strong> / zobrazuji <strong>help</strong>`;
+      }
+
+      if (isKnown && syncHash) {
+        window.history.replaceState({}, "", `#terminal-${view.command}`);
+      }
+    };
+
+    const playBootSequence = () => {
+      if (!output) return;
+      let current = 0;
+      output.textContent = "";
+      output.classList.add("is-booting");
+
+      const tick = () => {
+        output.textContent = bootLines.slice(0, current + 1).join("\n");
+        current += 1;
+
+        if (current < bootLines.length) {
+          window.setTimeout(tick, 180);
+          return;
+        }
+
+        window.setTimeout(() => {
+          enableTerminal();
+          render(commandFromHash() ?? "summary", false);
+          if (input instanceof HTMLInputElement) input.focus();
+        }, 260);
+      };
+
+      tick();
+    };
+
+    form?.addEventListener("submit", (event) => {
+      event.preventDefault();
+      render(input instanceof HTMLInputElement ? input.value : "help");
+    });
+
+    shortcuts.forEach((shortcut) => {
+      shortcut.addEventListener("click", () => {
+        const next = shortcut.dataset.terminalShortcut ?? "summary";
+        render(next);
+        if (input instanceof HTMLInputElement) input.focus();
+      });
+    });
+
+    window.addEventListener("hashchange", () => {
+      const next = commandFromHash();
+      if (next) {
+        render(next, false);
+      }
+    });
+
+    playBootSequence();
+  }
+
+  initMegaTerminal();
+  document.addEventListener("astro:page-load", initMegaTerminal);
+</script>
+
+<style>
+  .mega-terminal {
+    padding: 0.3rem 1.2rem 1.2rem;
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .terminal-anchor {
+    position: absolute;
+    top: -5.5rem;
+    left: 0;
+    display: block;
+    height: 0;
+    visibility: hidden;
+  }
+
+  .terminal-top,
+  .terminal-shell,
+  .terminal-sidebar,
+  .terminal-main,
+  .terminal-screen,
+  .terminal-input {
+    min-width: 0;
+  }
+
+  .terminal-top {
+    display: flex;
+    align-items: center;
+    gap: 0.85rem;
+    flex-wrap: wrap;
+  }
+
+  .window-chrome {
+    display: inline-flex;
+    gap: 0.35rem;
+    flex: 0 0 auto;
+  }
+
+  .window-chrome span {
+    width: 0.72rem;
+    height: 0.72rem;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.16);
+  }
+
+  .window-chrome span:first-child {
+    background: #ff6b6b;
+  }
+
+  .window-chrome span:nth-child(2) {
+    background: #ffd166;
+  }
+
+  .window-chrome span:last-child {
+    background: #7bd88f;
+  }
+
+  .terminal-path,
+  .terminal-state,
+  .sidebar-label,
+  .sidebar-help,
+  .prompt-label,
+  .screen-command,
+  .terminal-status,
+  .tty-text,
+  .tty-link,
+  .shortcut,
+  .terminal-input input,
+  .terminal-input button {
+    font-family: var(--font-mono);
+  }
+
+  .terminal-path,
+  .terminal-state {
+    color: var(--color-text-soft);
+    font-size: 0.78rem;
+  }
+
+  .terminal-state {
+    margin-left: auto;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+  }
+
+  .terminal-shell {
+    display: grid;
+    grid-template-columns: minmax(220px, 250px) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+  }
+
+  .terminal-sidebar,
+  .terminal-screen,
+  .terminal-input {
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-md);
+  }
+
+  .terminal-sidebar {
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.02);
+    display: grid;
+    gap: 1rem;
+  }
+
+  .sidebar-label {
+    margin: 0;
+    color: var(--color-text-soft);
+    font-size: 0.76rem;
+    letter-spacing: 0.08em;
+    text-transform: lowercase;
+  }
+
+  .shortcut-row {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .shortcut {
+    width: 100%;
+    text-align: left;
+    padding: 0.72rem 0.82rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.24);
+    color: var(--color-text-soft);
+    font-size: 0.8rem;
+    text-transform: lowercase;
+    cursor: pointer;
+    transition:
+      color var(--duration-fast) var(--easing),
+      border-color var(--duration-fast) var(--easing),
+      background-color var(--duration-fast) var(--easing);
+  }
+
+  .shortcut.is-active,
+  .shortcut:hover,
+  .shortcut:focus-visible,
+  .terminal-input button:hover,
+  .terminal-input button:focus-visible {
+    color: var(--color-accent);
+    border-color: rgba(245, 209, 13, 0.26);
+    background: rgba(245, 209, 13, 0.08);
+  }
+
+  .shortcut:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .sidebar-help {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.78rem;
+  }
+
+  .sidebar-help code {
+    color: var(--color-accent);
+  }
+
+  .terminal-main {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .terminal-screen {
+    padding: 1rem;
+    background:
+      linear-gradient(180deg, rgba(245, 209, 13, 0.04), transparent 18%),
+      rgba(0, 0, 0, 0.3);
+    display: grid;
+    gap: 1rem;
+  }
+
+  .screen-head {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+    flex-wrap: wrap;
+  }
+
+  .screen-title,
+  .screen-subtitle {
+    margin: 0;
+  }
+
+  .screen-title {
+    font-family: var(--font-display);
+    font-size: clamp(1.35rem, 2vw, 1.7rem);
+    line-height: 1;
+    text-transform: uppercase;
+    letter-spacing: -0.04em;
+  }
+
+  .screen-subtitle {
+    margin-top: 0.35rem;
+    color: var(--color-text-muted);
+  }
+
+  .screen-command {
+    color: var(--color-accent);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    white-space: nowrap;
+    overflow-wrap: anywhere;
+  }
+
+  .tty-output {
+    min-height: 28rem;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    background: rgba(0, 0, 0, 0.26);
+    display: grid;
+    align-content: start;
+    gap: 0.9rem;
+  }
+
+  .tty-text {
+    margin: 0;
+    color: var(--color-text);
+    white-space: pre-wrap;
+    word-break: break-word;
+    overflow-wrap: anywhere;
+    line-height: 1.72;
+    font-size: 0.91rem;
+    max-width: 100%;
+  }
+
+  .tty-text.is-booting::after {
+    content: "_";
+    margin-left: 0.15rem;
+    color: var(--color-accent);
+    animation: blink 1s steps(1) infinite;
+  }
+
+  :global(.tty-inline-link) {
+    color: var(--color-text);
+    text-decoration: none;
+  }
+
+  :global(.tty-inline-link:hover),
+  :global(.tty-inline-link:focus-visible) {
+    color: var(--color-accent);
+  }
+
+  .terminal-status {
+    margin: 0;
+    color: var(--color-text-soft);
+    font-size: 0.78rem;
+  }
+
+  .terminal-input {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr) auto;
+    gap: 0.7rem;
+    align-items: center;
+    padding: 0.95rem 1rem;
+    background: rgba(0, 0, 0, 0.3);
+  }
+
+  .prompt-label {
+    color: var(--color-accent);
+    font-size: 0.82rem;
+    white-space: nowrap;
+  }
+
+  .terminal-input input {
+    min-width: 0;
+    border: 0;
+    background: transparent;
+    color: var(--color-text);
+    font-size: 0.95rem;
+    outline: 0;
+  }
+
+  .terminal-input input:disabled {
+    opacity: 0.55;
+  }
+
+  .terminal-input button {
+    width: 2rem;
+    height: 2rem;
+    display: inline-grid;
+    place-items: center;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--color-text-soft);
+    font-size: 1.1rem;
+    cursor: pointer;
+    padding: 0;
+  }
+
+  .terminal-input button:disabled {
+    opacity: 0.45;
+    cursor: default;
+  }
+
+  .sr-only {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0, 0, 0, 0);
+    white-space: nowrap;
+    border: 0;
+  }
+
+  @keyframes blink {
+    50% {
+      opacity: 0;
+    }
+  }
+
+  @media (max-width: 920px) {
+    .terminal-shell {
+      grid-template-columns: 1fr;
+    }
+
+    .shortcut-row {
+      grid-template-columns: repeat(auto-fit, minmax(120px, 1fr));
+      display: grid;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .terminal-input {
+      grid-template-columns: 1fr auto;
+    }
+
+    .prompt-label {
+      grid-column: 1 / -1;
+      white-space: normal;
+    }
+
+    .screen-command {
+      white-space: normal;
+    }
+
+    .terminal-state {
+      margin-left: 0;
+    }
+
+    .tty-output {
+      min-height: 22rem;
+    }
+
+    .tty-text {
+      font-size: 0.86rem;
+    }
+  }
+</style>

@@ -1,0 +1,75 @@
+---
+interface Props {
+  index: string;
+  label: string;
+  title: string;
+  text?: string;
+  align?: "left" | "right";
+}
+
+const { index, label, title, text, align = "left" } = Astro.props;
+---
+
+<div class:list={["section-heading", align]} data-reveal>
+  <div class="meta">
+    <span class="index">{index}</span>
+    <span class="eyebrow">{label}</span>
+  </div>
+  <div class="copy">
+    <h2 class="heading-lg">{title}</h2>
+    {text && <p class="lede">{text}</p>}
+  </div>
+</div>
+
+<style>
+  .section-heading {
+    display: grid;
+    grid-template-columns: minmax(74px, 110px) minmax(0, 1fr);
+    gap: 1rem;
+    align-items: start;
+    margin-bottom: 2rem;
+  }
+
+  .section-heading.right {
+    grid-template-columns: minmax(0, 1fr) minmax(74px, 110px);
+  }
+
+  .section-heading.right .meta {
+    order: 2;
+    justify-self: end;
+  }
+
+  .section-heading.right .copy {
+    order: 1;
+  }
+
+  .meta {
+    display: grid;
+    gap: 0.5rem;
+  }
+
+  .index {
+    font-family: var(--font-mono);
+    font-size: 0.86rem;
+    color: var(--color-text-soft);
+    letter-spacing: 0.16em;
+  }
+
+  .copy {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  @media (max-width: 720px) {
+    .section-heading,
+    .section-heading.right {
+      grid-template-columns: 1fr;
+    }
+
+    .section-heading.right .meta,
+    .section-heading.right .copy {
+      order: initial;
+      justify-self: start;
+    }
+  }
+</style>

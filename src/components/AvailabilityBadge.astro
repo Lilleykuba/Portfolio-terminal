@@ -1,0 +1,44 @@
+---
+interface Props {
+  status: string;
+  note?: string;
+}
+
+const { status, note } = Astro.props;
+---
+
+<div class="availability" aria-label="Aktuální dostupnost">
+  <span class="dot" aria-hidden="true"></span>
+  <span>{status}</span>
+  {note && <span class="note">{note}</span>}
+</div>
+
+<style>
+  .availability {
+    display: inline-flex;
+    flex-wrap: wrap;
+    gap: 0.6rem;
+    align-items: center;
+    padding: 0.4rem 0.8rem;
+    border: 1px solid rgba(245, 209, 13, 0.25);
+    border-radius: 999px;
+    background: rgba(245, 209, 13, 0.08);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 0.76rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .dot {
+    width: 0.58rem;
+    height: 0.58rem;
+    border-radius: 50%;
+    background: var(--color-accent);
+    box-shadow: 0 0 0 0.28rem rgba(245, 209, 13, 0.12);
+  }
+
+  .note {
+    color: var(--color-text-soft);
+  }
+</style>

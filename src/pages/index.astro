@@ -1,0 +1,231 @@
+---
+import MiniTerminal from "@components/MiniTerminal.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { profile } from "@data/profile";
+import { availability } from "@data/site";
+import { socialLinks } from "@data/socials";
+const emailLink = socialLinks.find((link) => link.label === "E-mail");
+---
+
+<BaseLayout>
+  <section class="hero section">
+    <div class="container hero-grid">
+      <div class="hero-copy" data-reveal>
+        <span class="eyebrow">Brno / web / cybersecurity</span>
+        <p class="hero-label">{profile.roleLabel}</p>
+        <h1 class="heading-xl hero-title" aria-label={profile.headline}>
+          {profile.headlineLines.map((line) => (
+            <span>{line}</span>
+          ))}
+        </h1>
+        <p class="lede">{profile.intro}</p>
+        <div class="button-row">
+          <a class="button button-primary" href={profile.primaryCta.href}>{profile.primaryCta.label}</a>
+          <a class="button button-secondary" href={profile.secondaryCta.href}>{profile.secondaryCta.label}</a>
+        </div>
+      </div>
+
+      <aside class="hero-panel surface" data-reveal>
+        <div class="availability-strip">
+          <span class="kicker">Status</span>
+          <strong>{availability.status}</strong>
+        </div>
+        <div class="panel-copy">
+          <p class="panel-title">Vše důležité je níže v terminalu.</p>
+          <ul>
+            {profile.heroGuide.map((item) => (
+              <li>
+                <a class="guide-link" href={`/#terminal-${item.command}`}>
+                  <span>{item.command}</span>
+                  <strong>{item.note}</strong>
+                </a>
+              </li>
+            ))}
+          </ul>
+        </div>
+        {emailLink && (
+          <a class="hero-inline-link" href={emailLink.href}>
+            {emailLink.handle}
+          </a>
+        )}
+      </aside>
+    </div>
+  </section>
+
+  <section class="section terminal-section" id="terminal">
+    <div class="container">
+      <MiniTerminal />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .hero {
+    padding-top: 2.4rem;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
+    gap: 0.9rem;
+    align-items: stretch;
+  }
+
+  .hero-copy,
+  .hero-panel {
+    min-width: 0;
+  }
+
+  .hero-copy {
+    display: grid;
+    gap: 1.05rem;
+    padding: clamp(1.2rem, 3vw, 2rem);
+    border: 1px solid rgba(245, 209, 13, 0.18);
+    border-radius: var(--radius-lg);
+    background:
+      linear-gradient(135deg, rgba(245, 209, 13, 0.12), transparent 40%),
+      rgba(255, 255, 255, 0.02);
+    position: relative;
+  }
+
+  .hero-copy::after {
+    content: "";
+    position: absolute;
+    inset: auto 1.1rem 1.1rem auto;
+    width: 3rem;
+    height: 3rem;
+    border-right: 3px solid rgba(245, 209, 13, 0.6);
+    border-bottom: 3px solid rgba(245, 209, 13, 0.6);
+  }
+
+  .hero-label {
+    margin: 0;
+    font-family: var(--font-mono);
+    font-size: 0.84rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+    overflow-wrap: anywhere;
+  }
+
+  .hero-title {
+    max-width: min(100%, 11.25ch);
+    font-size: clamp(2rem, 5.9vw, 4.6rem);
+    line-height: 0.9;
+    display: grid;
+    justify-items: start;
+    gap: 0.12em;
+    hyphens: none;
+  }
+
+  .hero-title span {
+    display: block;
+    max-width: 100%;
+    white-space: nowrap;
+    word-break: normal;
+    overflow-wrap: normal;
+    hyphens: none;
+  }
+
+  .hero-panel {
+    padding: 1.35rem;
+    display: grid;
+    gap: 1rem;
+    align-content: start;
+  }
+
+  .availability-strip,
+  .panel-copy,
+  .panel-copy ul {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .availability-strip strong {
+    font-family: var(--font-display);
+    font-size: 1.55rem;
+    text-transform: uppercase;
+    line-height: 1;
+  }
+
+  .panel-title {
+    margin: 0;
+    font-size: 1.05rem;
+  }
+
+  .panel-copy ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+  }
+
+  .panel-copy li {
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .guide-link {
+    display: grid;
+    gap: 0.2rem;
+  }
+
+  .guide-link:hover strong,
+  .guide-link:focus-visible strong {
+    color: var(--color-accent);
+  }
+
+  .panel-copy span {
+    font-family: var(--font-mono);
+    font-size: 0.73rem;
+    color: var(--color-text-soft);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+  }
+
+  .hero-inline-link {
+    font-family: var(--font-mono);
+    color: var(--color-accent);
+    font-size: 0.82rem;
+    letter-spacing: 0.08em;
+    overflow-wrap: anywhere;
+  }
+
+  .terminal-section {
+    padding-top: 2.2rem;
+  }
+
+  .hero + .terminal-section {
+    border-top: 0;
+    padding-top: 1.1rem;
+  }
+
+  @media (max-width: 900px) {
+    .hero-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 780px) {
+    .hero-copy {
+      padding-right: 1.2rem;
+    }
+  }
+
+  @media (max-width: 720px) {
+    .hero-title {
+      max-width: 100%;
+      font-size: clamp(1.85rem, 8vw, 3rem);
+      gap: 0.13em;
+    }
+
+    .hero-title span {
+      white-space: normal;
+    }
+  }
+
+  @media (max-width: 560px) {
+    .hero-panel {
+      padding: 1.1rem;
+    }
+  }
+</style>

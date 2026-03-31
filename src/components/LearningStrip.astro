@@ -1,0 +1,50 @@
+---
+import { profile } from "@data/profile";
+---
+
+<section class="learning surface" data-reveal>
+  <span class="eyebrow">Aktuálně rozvíjím</span>
+  <div class="items">
+    {profile.currentLearning.map((item) => (
+      <div class="item">
+        <span class="marker" aria-hidden="true"></span>
+        <p>{item}</p>
+      </div>
+    ))}
+  </div>
+</section>
+
+<style>
+  .learning {
+    padding: 1rem 1.3rem;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .items {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .item {
+    display: flex;
+    gap: 0.7rem;
+    align-items: flex-start;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .marker {
+    width: 0.55rem;
+    height: 0.55rem;
+    margin-top: 0.4rem;
+    background: var(--color-accent);
+    flex: 0 0 auto;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+</style>

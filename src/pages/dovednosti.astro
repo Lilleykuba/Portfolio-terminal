@@ -1,0 +1,105 @@
+---
+import PageIntro from "@components/PageIntro.astro";
+import SectionHeading from "@components/SectionHeading.astro";
+import SkillMatrix from "@components/SkillMatrix.astro";
+import BaseLayout from "@layouts/BaseLayout.astro";
+import { levelLabels } from "@data/skills";
+---
+
+<BaseLayout title="Dovednosti | Portfolio" description="Frontend, webové základy, enterprise kontext a analytické dovednosti.">
+  <PageIntro
+    eyebrow="Dovednosti"
+    title="Rozsah, který stojí na základech, ne na dojmu."
+    text="Dovednosti držím rozdělené po logických skupinách. Je pro mě důležité rozlišovat mezi silnou orientací, praktickou zkušeností a oblastmi, které právě cíleně rozvíjím."
+    sideLabel="Přehled bez přikrášlování"
+  />
+
+  <section class="section">
+    <div class="container split-grid">
+      <div class="surface levels" data-reveal>
+        <span class="eyebrow">Legenda úrovní</span>
+        <ul>
+          {Object.entries(levelLabels).map(([key, value]) => (
+            <li>
+              <span class:list={["badge", key]}>{value}</span>
+              <p>
+                {key === "silne" && "Oblast, ve které se pohybuji jistě a umím ji použít s rozumem."}
+                {key === "prakticky" && "Nástroje a technologie, se kterými mám reálný kontakt a umím je prakticky použít."}
+                {key === "rozvijim" && "Směr, do kterého investuji čas a systematicky ho posiluji."}
+              </p>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      <div class="surface note" data-reveal>
+        <span class="eyebrow">Přístup</span>
+        <p>
+          Nejde mi o vyjmenování co nejvíce technologií. Důležitější je pro mě schopnost
+          pochopit problém, rozložit ho a zvolit adekvátní nástroj. Právě proto držím
+          prezentaci dovedností realistickou.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="section">
+    <div class="container">
+      <SectionHeading
+        index="01"
+        label="Matrice"
+        title="Technický profil po vrstvách."
+        text="Kombinace frontendu, webových základů, enterprise kontextu a širších analytických zájmů."
+      />
+      <SkillMatrix />
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .levels,
+  .note {
+    padding: 1.3rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .levels ul {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.9rem;
+  }
+
+  .levels li {
+    display: grid;
+    gap: 0.45rem;
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .badge {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.74rem;
+  }
+
+  .badge.silne {
+    color: var(--color-accent);
+  }
+
+  .badge.prakticky {
+    color: var(--color-text);
+  }
+
+  .badge.rozvijim {
+    color: #e2bd00;
+  }
+
+  p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+</style>

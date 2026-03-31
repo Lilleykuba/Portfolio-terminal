@@ -1,0 +1,77 @@
+---
+import { availability } from "@data/site";
+import { profile } from "@data/profile";
+---
+
+<footer class="site-footer">
+  <div class="container footer-grid">
+    <div class="identity">
+      <p class="eyebrow">Konec stránky</p>
+      <p class="statement">
+        {profile.location} / {availability.status.toLowerCase()} / junior profil pro web,
+        cybersecurity a technicky čistou práci.
+      </p>
+    </div>
+    <div class="meta">
+      <span class="meta-line">Web / Cybersecurity / SAP SuccessFactors</span>
+      <span>Brno / Czech Republic</span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .site-footer {
+    padding: 2rem 0 3rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .footer-grid {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 1rem;
+    align-items: end;
+  }
+
+  .identity {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .statement {
+    margin: 0;
+    max-width: 60ch;
+    color: var(--color-text-muted);
+  }
+
+  .meta {
+    display: grid;
+    gap: 0.35rem;
+    justify-items: end;
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    font-size: clamp(0.6rem, 1.5vw, 0.72rem);
+    color: var(--color-text-soft);
+  }
+
+  .meta-line {
+    max-width: none;
+    text-align: right;
+    white-space: nowrap;
+  }
+
+  @media (max-width: 700px) {
+    .footer-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .meta {
+      justify-items: start;
+    }
+
+    .meta-line {
+      text-align: left;
+      white-space: nowrap;
+    }
+  }
+</style>

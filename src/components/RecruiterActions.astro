@@ -1,0 +1,102 @@
+---
+import { documents } from "@data/site";
+import { socialLinks } from "@data/socials";
+
+const emailLink = socialLinks.find((link) => link.label === "E-mail");
+const githubLink = socialLinks.find((link) => link.label === "GitHub");
+const linkedinLink = socialLinks.find((link) => link.label === "LinkedIn");
+const cvHref = documents.cvHref || emailLink?.href || "/#terminal-contact";
+const cvText = documents.cvHref ? "Stáhnout CV" : "CV na vyžádání";
+---
+
+<section class="actions surface" data-reveal>
+  <div class="copy">
+    <span class="eyebrow">Rychlé odkazy</span>
+    <h2 class="heading-md">To nejdůležitější bez hledání po stránce.</h2>
+    <p class="lede">
+      Pokud je profil relevantní, tady jsou hned po ruce hlavní odkazy: CV, LinkedIn,
+      GitHub a přímý kontakt.
+    </p>
+  </div>
+
+  <div class="action-grid">
+    <a class="action-card primary" href={cvHref} target={documents.cvHref ? "_blank" : undefined} rel={documents.cvHref ? "noreferrer" : undefined}>
+      <span>CV</span>
+      <strong>{cvText}</strong>
+    </a>
+    {linkedinLink && (
+      <a class="action-card" href={linkedinLink.href} target="_blank" rel="noreferrer">
+        <span>LinkedIn</span>
+        <strong>{linkedinLink.handle}</strong>
+      </a>
+    )}
+    {githubLink && (
+      <a class="action-card" href={githubLink.href} target="_blank" rel="noreferrer">
+        <span>GitHub</span>
+        <strong>{githubLink.handle}</strong>
+      </a>
+    )}
+    {emailLink && (
+      <a class="action-card" href={emailLink.href}>
+        <span>E-mail</span>
+        <strong>{emailLink.handle}</strong>
+      </a>
+    )}
+  </div>
+</section>
+
+<style>
+  .actions {
+    padding: 1.3rem;
+    display: grid;
+    gap: 1rem;
+  }
+
+  .copy {
+    display: grid;
+    gap: 0.8rem;
+  }
+
+  .action-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+    gap: 0.8rem;
+  }
+
+  .action-card {
+    display: grid;
+    gap: 0.2rem;
+    padding: 1rem;
+    border-radius: var(--radius-md);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.03);
+    transition:
+      transform var(--duration-fast) var(--easing),
+      border-color var(--duration-fast) var(--easing),
+      background-color var(--duration-fast) var(--easing);
+  }
+
+  .action-card.primary {
+    background: rgba(245, 209, 13, 0.09);
+    border-color: rgba(245, 209, 13, 0.22);
+  }
+
+  .action-card:hover,
+  .action-card:focus-visible {
+    transform: translate(-2px, -2px);
+    border-color: rgba(245, 209, 13, 0.34);
+    background: rgba(245, 209, 13, 0.09);
+  }
+
+  .action-card span {
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    font-size: 0.72rem;
+    color: var(--color-text-soft);
+  }
+
+  .action-card strong {
+    font-size: 1rem;
+  }
+</style>
