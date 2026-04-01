@@ -1,27 +1,25 @@
 ---
-category: "personal"
-title: "Portfolio jako obsahový systém"
-summary: "Osobní web v Astro navržený jako rychlý, přehledný a snadno upravitelný základ pro portfolio a další obsah."
+category: "freelance"
+title: "Webové stránky vinného sklepa"
+summary: "Web pro sklep k pronájmu, integrace kalendáře, rezervační formulář a jednoduché CMS"
 description: "Projekt ukazuje práci s frontendem, vizuální hierarchií a content-first strukturou, která se dá dlouhodobě rozšiřovat bez zásahu do základní architektury."
-proof: "Je na něm vidět práce s Astro, typed data, komponentovým návrhem a pečlivým UI detailem."
-learning: "Jak navrhnout obsahovou architekturu a komponenty tak, aby web zůstal čitelný, rychlý a dobře udržovatelný."
-nextStep: "Průběžně rozšiřovat o další reálné projekty, delší texty a konkrétnější pracovní case studies."
+proof: "Je na něm vidět práce s Astro, React, komponentovým návrhem a pečlivým UI detailem."
 stack:
   - Astro
   - TypeScript
   - CSS
-  - Markdown
-role: "Návrh struktury, UI, frontend implementace"
+  - React
+role: "Návrh struktury, UI, frontend implementace, setup domény"
 featured: true
-year: 2026
+year: 2025
 status: "Frontend projekt"
 github: "https://github.com/username/brutalist-portfolio"
-demo: "https://portfolio-brno.netlify.app"
+demo: "https://sklepzavinohradem.cz"
 order: 1
 tags:
   - portfolio
-  - design system
-  - content architecture
+  - freelance
+  - CMS
 ---
 
 ## Kontext

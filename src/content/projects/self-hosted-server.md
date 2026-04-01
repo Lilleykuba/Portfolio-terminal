@@ -1,25 +1,22 @@
 ---
 category: "personal"
-title: "Security Notes Lab"
-summary: "Studijní projekt pro systematické poznámky k web security a bezpečnostnímu uvažování."
-description: "Projekt ukazuje, jak si organizuji bezpečnostní témata tak, aby zůstala použitelná i mimo jednorázové čtení nebo nahodilé bookmarky."
+title: "Self-hosted home server"
+summary: "Vlastní on-premise home server pro snížení závislosti na centralizovaných aplikacích."
+description: "Projekt zahrnuje setup linux serveru, reverse proxy, VPN meshnet setup, DNS filtering a maintanence"
 proof: "Ukazuje security mindset, disciplínu v práci s informacemi a schopnost převádět učení do použitelné struktury."
-learning: "Jak si budovat vlastní systém poznámek tak, aby pomáhal při dalším studiu i při praktickém rozhodování."
-nextStep: "Postupně rozšířit o konkrétní checklisty, zranitelnosti a praktické ukázky z webového prostředí."
 stack:
-  - Markdown
-  - Node.js
-  - Git
-role: "Výzkum, strukturování poznámek, obsah"
+  - Docker
+  - PiHole
+  - Nginx
+role: "HW setup, VM setup, networking, docker deployment, maintanence"
 featured: true
-year: 2026
-status: "Studijní projekt"
-github: "https://github.com/username/security-notes"
+year: 2025
+status: "Home server"
 order: 2
 tags:
-  - cybersecurity
-  - notes
-  - research
+  - self-hosting
+  - virtualization
+  - docker
 ---
 
 ## Kontext
