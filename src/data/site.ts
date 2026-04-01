@@ -25,6 +25,6 @@ export const availability = {
 
 export const documents = {
   cvLabel: "CV",
-  cvHref: "",
-  cvNote: "Pro produkci doporuceno vlozit PDF do public/cv.pdf a nastavit cvHref na /cv.pdf.",
+  cvHref: "/jakubcv.pdf",
+  cvNote: "",
 };

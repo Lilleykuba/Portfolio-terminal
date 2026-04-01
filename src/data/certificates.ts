@@ -8,24 +8,24 @@ export type Certificate = {
 
 export const certificates: Certificate[] = [
   {
-    title: "Google Cybersecurity Certificate",
-    issuer: "Google / Coursera",
-    year: "2026",
-    status: "placeholder k nahrazeni",
-    href: "https://example.com/certificates/google-cybersecurity",
+    title: "Cybersecurity 101",
+    issuer: "TryHackMe",
+    year: "2025",
+    status: "completed",
+    href: "https://tryhackme-certificates.s3-eu-west-1.amazonaws.com/THM-MY57TWTWKA.pdf",
   },
   {
-    title: "ISC2 Certified in Cybersecurity",
-    issuer: "ISC2",
+    title: "Jr Penetration Tester",
+    issuer: "TryHackMe",
     year: "2026",
-    status: "placeholder k nahrazeni",
-    href: "https://example.com/certificates/isc2-cc",
+    status: "completed",
+    href: "https://tryhackme-certificates.s3-eu-west-1.amazonaws.com/THM-CSZYTWLCW4.pdf",
   },
   {
-    title: "JavaScript Algorithms and Data Structures",
-    issuer: "freeCodeCamp",
-    year: "2026",
-    status: "placeholder k nahrazeni",
-    href: "https://example.com/certificates/javascript-algorithms",
+    title: "JavaScript Algorithms and Data structures",
+    issuer: "FreeCodeCamp",
+    year: "2024",
+    status: "completed",
+    href: "https://freecodecamp.org/certification/camobeast/javascript-algorithms-and-data-structures",
   },
 ];
