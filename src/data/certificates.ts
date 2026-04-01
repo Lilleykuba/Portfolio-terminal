@@ -24,7 +24,7 @@ export const certificates: Certificate[] = [
   {
     title: "JavaScript Algorithms and Data structures",
     issuer: "FreeCodeCamp",
-    year: "2024",
+    year: "2023",
     status: "completed",
     href: "https://freecodecamp.org/certification/camobeast/javascript-algorithms-and-data-structures",
   },

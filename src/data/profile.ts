@@ -18,7 +18,7 @@ export const profile = {
     { command: "summary", note: "rychlý scan profilu a fitu" },
     { command: "projects", note: "vybrané projekty a detail" },
     { command: "contact", note: "nejrychlejší způsob spojení" },
-    { command: "cv", note: "CV nebo vyžádání" },
+    { command: "cv", note: "CV k nahlédnutí" },
   ],
   quickFacts: [
     { label: "Směr", value: "Web development / cybersecurity" },

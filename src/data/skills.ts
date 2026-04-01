@@ -81,7 +81,7 @@ export const skillGroups: SkillGroup[] = [
       {
         name: "SAP SuccessFactors",
         level: "prakticky",
-        note: "aktuální profesní zaměření - ownership compensation, LMS, RMK, EC modulů",
+        note: "aktuální profesní zaměření - ownership Comp, LMS, EC modulů",
       },
       {
         name: "Cybersecurity mindset",
