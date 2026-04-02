@@ -89,24 +89,6 @@ const views = {
         href: `/projekty/${project.id}/`,
         external: false,
       },
-      ...(project.data.github
-        ? [
-            {
-              label: `open ${project.id} / github`,
-              href: project.data.github,
-              external: true,
-            },
-          ]
-        : []),
-      ...(project.data.demo
-        ? [
-            {
-              label: `open ${project.id} / ukazka`,
-              href: project.data.demo,
-              external: true,
-            },
-          ]
-        : []),
     ]),
   },
   certs: {
