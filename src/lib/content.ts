@@ -47,15 +47,9 @@ export async function getProjectsGroupedByCategory() {
     .map((category) => ({
       category,
       meta: projectCategoryMeta[category],
-      projects: projects.filter((project) => project.data.category === category),
+      projects: projects.filter(
+        (project) => project.data.category === category,
+      ),
     }))
     .filter((group) => group.projects.length > 0);
-}
-
-export async function getNotes() {
-  const notes = await getCollection("notes", ({ data }) => !data.draft);
-  return notes.sort(
-    (left, right) =>
-      right.data.publishedAt.getTime() - left.data.publishedAt.getTime(),
-  );
 }

@@ -382,21 +382,23 @@ const bootLines = [
     };
 
     const wrapTtyLine = (line, maxWidth = 78) => {
-      if (!line || line.length <= maxWidth) return [line];
+      if (!line) return [line];
       if (/^[+|]/.test(line)) return [line];
 
       const mobile = isMobileViewport();
       const valueMatch = line.match(/^(.*?:\s)(.+)$/);
       const indentedMatch = !valueMatch ? line.match(/^(\s+)(.+)$/) : null;
 
+      if (mobile && valueMatch) {
+        const labelLine = valueMatch[1].replace(/:\s*$/, "").trimEnd();
+        const content = valueMatch[2].replaceAll(" | ", ", ");
+        return [labelLine, ...wrapContent(content, maxWidth, "  ")];
+      }
+
+      if (line.length <= maxWidth) return [line];
+
       const rawPrefix = valueMatch?.[1] ?? indentedMatch?.[1] ?? "";
       const content = (valueMatch?.[2] ?? indentedMatch?.[2] ?? line).replaceAll(" | ", mobile ? ", " : " | ");
-
-      if (valueMatch && mobile) {
-        const labelLine = rawPrefix.trimEnd();
-        const valuePrefix = "  ";
-        return [labelLine, ...wrapContent(content, maxWidth, valuePrefix)];
-      }
 
       const prefix = indentedMatch && mobile ? "  " : rawPrefix;
       const continuationPrefix = valueMatch ? " ".repeat(prefix.length) : prefix || "";
