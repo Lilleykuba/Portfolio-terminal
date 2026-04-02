@@ -322,26 +322,44 @@ const bootLines = [
         .replaceAll("<", "&lt;")
         .replaceAll(">", "&gt;");
 
-    const wrapTtyLine = (line, maxWidth = 78) => {
-      if (!line || line.length <= maxWidth) return [line];
-      if (/^[+|]/.test(line)) return [line];
+    const isMobileViewport = () => window.matchMedia("(max-width: 720px)").matches;
 
-      const valueMatch = line.match(/^(.*?:\s)(.+)$/);
-      const indentedMatch = !valueMatch ? line.match(/^(\s+)(.+)$/) : null;
+    const getMaxWidth = () => {
+      if (!(output instanceof HTMLElement)) {
+        return isMobileViewport() ? 30 : 78;
+      }
 
-      const prefix = valueMatch?.[1] ?? indentedMatch?.[1] ?? "";
-      const content = valueMatch?.[2] ?? indentedMatch?.[2] ?? line;
-      const continuationPrefix = valueMatch ? " ".repeat(prefix.length) : prefix || "";
-      const availableWidth = Math.max(maxWidth - continuationPrefix.length, 16);
+      const approxCharacterWidth = isMobileViewport() ? 8.2 : 8.8;
+      const viewportWidth = Math.floor(output.clientWidth / approxCharacterWidth);
+      return Math.max(isMobileViewport() ? 28 : 42, viewportWidth - 2);
+    };
 
+    const getResponsiveLines = (lines) => {
+      if (!window.matchMedia("(max-width: 720px)").matches) {
+        return lines;
+      }
+
+      if (
+        lines.length >= 3 &&
+        /^\+[-+]+\+$/.test(lines[0]) &&
+        /^\|.*\|$/.test(lines[1]) &&
+        /^\+[-+]+\+$/.test(lines[2])
+      ) {
+        return lines.slice(3);
+      }
+
+      return lines;
+    };
+
+    const wrapContent = (content, maxWidth, prefix = "") => {
       const words = content.split(/\s+/).filter(Boolean);
-      if (!words.length) return [line];
+      if (!words.length) return [prefix.trimEnd()];
 
       const wrapped = [];
       let current = prefix;
 
       words.forEach((word) => {
-        const separator = current.trim() === prefix.trim() || current === prefix ? "" : " ";
+        const separator = current.trim().length > prefix.trim().length ? " " : "";
         const candidate = `${current}${separator}${word}`;
 
         if (candidate.length <= maxWidth) {
@@ -353,12 +371,7 @@ const bootLines = [
           wrapped.push(current);
         }
 
-        current = `${continuationPrefix}${word}`;
-
-        while (current.length > maxWidth) {
-          wrapped.push(current.slice(0, maxWidth));
-          current = `${continuationPrefix}${current.slice(maxWidth)}`;
-        }
+        current = `${prefix}${word}`;
       });
 
       if (current.trim().length > 0) {
@@ -368,11 +381,42 @@ const bootLines = [
       return wrapped;
     };
 
+    const wrapTtyLine = (line, maxWidth = 78) => {
+      if (!line || line.length <= maxWidth) return [line];
+      if (/^[+|]/.test(line)) return [line];
+
+      const mobile = isMobileViewport();
+      const valueMatch = line.match(/^(.*?:\s)(.+)$/);
+      const indentedMatch = !valueMatch ? line.match(/^(\s+)(.+)$/) : null;
+
+      const rawPrefix = valueMatch?.[1] ?? indentedMatch?.[1] ?? "";
+      const content = (valueMatch?.[2] ?? indentedMatch?.[2] ?? line).replaceAll(" | ", mobile ? ", " : " | ");
+
+      if (valueMatch && mobile) {
+        const labelLine = rawPrefix.trimEnd();
+        const valuePrefix = "  ";
+        return [labelLine, ...wrapContent(content, maxWidth, valuePrefix)];
+      }
+
+      const prefix = indentedMatch && mobile ? "  " : rawPrefix;
+      const continuationPrefix = valueMatch ? " ".repeat(prefix.length) : prefix || "";
+      return wrapContent(content, Math.max(maxWidth, 16), prefix).flatMap((wrappedLine, index) => {
+        if (index === 0 && valueMatch) {
+          return [`${prefix}${wrappedLine.slice(prefix.length)}`];
+        }
+        if (index === 0) {
+          return [wrappedLine];
+        }
+        return [`${continuationPrefix}${wrappedLine.slice(prefix.length)}`];
+      });
+    };
+
     const renderOutput = (view) => {
       if (!output) return;
+      const maxWidth = getMaxWidth();
 
-      const textBlock = view.lines
-        .flatMap((line) => wrapTtyLine(line))
+      const textBlock = getResponsiveLines(view.lines)
+        .flatMap((line) => wrapTtyLine(line, maxWidth))
         .map((line) => escapeHtml(line))
         .join("\n");
       const linkBlock = (view.actions ?? [])
@@ -464,6 +508,12 @@ const bootLines = [
       const next = commandFromHash();
       if (next) {
         render(next, false);
+      }
+    });
+
+    window.addEventListener("resize", () => {
+      if (input instanceof HTMLInputElement && !input.disabled) {
+        render(input.value || "summary", false);
       }
     });
 

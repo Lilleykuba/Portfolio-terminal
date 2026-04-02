@@ -1,5 +1,5 @@
 export const siteMeta = {
-  siteUrl: "https://portfolio-brno.netlify.app",
+  siteUrl: "https://lilleyjakub.cz",
   title: "Jakub | Web developer a cybersecurity",
   description:
     "Portfolio junior web developera z Brna se zájmem o frontend, cybersecurity, HRIT, SAP SuccessFactors a dobře navržené digitální systémy.",
@@ -26,5 +26,5 @@ export const availability = {
 export const documents = {
   cvLabel: "CV",
   cvHref: "/jakubcv.pdf",
-  cvNote: "",
+  cvNote: "CV v pdf",
 };
