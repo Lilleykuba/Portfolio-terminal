@@ -21,12 +21,13 @@ tags:
 
 ## Kontext
 
-Bezpečnost mě zajímá dlouhodobě, ale nechtěl jsem zůstat u nahodilého čtení článků. Potřeboval jsem způsob, jak si témata ukládat tak, aby se k nim dalo vracet systematicky.
+V rámci přechodu na open source, decentralizované a celkově bezpečnější aplikace, ve kterých mám kontrolu nad svými daty, jsem se rozhodl přejít na self-hosted verze většiny mých nejpoužívanějších aplikací.
 
 ## Přístup
 
-Každé téma rozděluji na princip, riziko, praktický dopad a otevřené otázky. Cílem není sbírka termínů, ale rámec, který pomáhá přemýšlet přesněji a vracet se k tématům systematicky.
+K celému procesu nastavení VMs, spuštění aplikací skrz docker, nastavení reverse proxy, VPN meshnetu a DNS filtru jsem přistupoval jako příležitosti naučit se prakticky pracovat s linux servery, složitějším networkingem, kontejnerizací...
 
 ## Výsledek
 
-Projekt mi pomáhá propojovat bezpečnostní myšlení s webovým vývojem a posouvat se od obecného zájmu k disciplinovanému učení.
+Jsem velmi spokojený s výsledkem, server využívám denně k zálohování, psaní poznámek a filtrování reklam. Naučil jsem se práci s více linux servery propojenými wireguardem a práci s docker compose a nginx.
+Asi 2 měsíce trvalo, než jsem doladil veškeré chyby a nestability systému, ale teď už běží bez problémů.

@@ -24,12 +24,12 @@ tags:
 
 ## Kontext
 
-Potřeboval jsem web, který nebude jen hezká vizitka, ale zároveň použitelný základ pro další růst. Důležité bylo, aby šel snadno upravovat a aby z něj bylo rychle poznat, jak přemýšlím o frontendu a struktuře.
+Požadavek byl vytvořit kompletní webovou prezentaci pro vinný sklep k pronájmu obsahující integraci kalendáře z echalupy.cz, rezervační formulář s napojením na email, galerii a jednoduchý CMS pro úpravu informací a ceny.
 
 ## Přístup
 
-Zvolil jsem Astro s content collections a rozdělil krátká strukturovaná data od delšího obsahu. Díky tomu je možné upravovat texty, projekty nebo odkazy bez zásahu do základního layoutu.
+Zvolil jsem Astro, web rozdělil na několik stránek a implementoval pomocí znovu použitelných komponent. Deployment na Netlify.
 
 ## Výsledek
 
-Vznikl rychlý a rozšiřitelný web, který funguje jako portfolio i jako praktická ukázka práce s moderním frontendem a obsahovou architekturou.
+Vznikl rychlý a upravitelný web, který funguje jako prezentace a reklama i jako rezervační systém pro zákazníky.
