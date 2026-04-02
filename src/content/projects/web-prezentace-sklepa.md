@@ -13,7 +13,6 @@ role: "Návrh struktury, UI, frontend implementace, setup domény"
 featured: true
 year: 2025
 status: "Frontend projekt"
-github: "https://github.com/Lilleykuba/SklepZaVinohradem"
 demo: "https://sklepzavinohradem.cz"
 order: 1
 tags:
