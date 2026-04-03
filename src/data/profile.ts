@@ -15,7 +15,7 @@ export const profile = {
     href: "/#terminal-cv",
   },
   heroGuide: [
-    { command: "summary", note: "rychlý scan profilu a fitu" },
+    { command: "summary", note: "rychlé shrnutí profilu a fitu" },
     { command: "projects", note: "vybrané projekty a detail" },
     { command: "contact", note: "nejrychlejší způsob spojení" },
     { command: "cv", note: "CV k nahlédnutí" },
@@ -28,7 +28,7 @@ export const profile = {
     { label: "Jazyky", value: "čeština / angličtina" },
   ],
   recruiterSummary:
-    "Největší smysl dávám v týmu, který hledá juniorního člověka s dobrým webovým základem, pečlivým přístupem k detailu, bezpečnostním uvažováním a ochotou rychle se učit v produktovém, interním nebo enterprise prostředí.",
+    "Největší smysl dávám v týmu, který hledá juniorního člověka s dobrým přehledem o IT a webových technologiích, pečlivým přístupem, bezpečnostním uvažováním a ochotou rychle se učit v produktovém, interním nebo enterprise prostředí.",
   roleTargets: [
     "junior frontend developer",
     "junior web developer",
