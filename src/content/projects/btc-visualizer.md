@@ -1,7 +1,7 @@
 ---
 category: "personal"
 title: "BTC-Visualizer"
-summary: "Portfolio dashboard, který převádí veřejná Bitcoin data do přehledné a klidné analytické aplikace."
+summary: "Dashboard, který převádí veřejná Bitcoin data do přehledné analytické aplikace."
 description: "Aplikace kombinuje tržní, síťové a emisní metriky Bitcoinu do několika kurátorovaných pohledů. Důraz je na čitelnost, práci s veřejnými API, transformaci dat, graceful degradation a Astro architekturu s minimem klientského JavaScriptu."
 proof: "Ukazuje produktové uvažování, práci s veřejnými daty, datovou vizualizaci, čistou frontend architekturu a schopnost postavit malý, ale přesvědčivý open-source projekt."
 stack:
