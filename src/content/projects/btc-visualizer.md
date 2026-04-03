@@ -15,9 +15,9 @@ role: "Product design, frontend development, data integration, UI architecture"
 featured: true
 year: 2026
 status: "V aktivním vývoji"
-github: ""
-demo: ""
-order: 4
+github: "https://github.com/Lilleykuba/BTC-Visualizer"
+demo: "https://btc-visualizer.netlify.app"
+order: 5
 tags:
   - web app
   - data visualization
