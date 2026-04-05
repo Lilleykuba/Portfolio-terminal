@@ -23,4 +23,4 @@ Web je postavený v Astro, TypeScriptu a plain CSS. Hlavní stránka funguje jak
 
 ## Netlify
 
-Repo je připravený pro statický deploy na Netlify.
+Repo je live na Netlify
