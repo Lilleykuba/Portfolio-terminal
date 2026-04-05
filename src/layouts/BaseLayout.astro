@@ -64,6 +64,9 @@ const imageUrl = new URL(image, Astro.site).toString();
     <SiteFooter />
 
     <script>
+      data-goatcounter="https://term-portfolio.goatcounter.com/count"
+        async src="//gc.zgo.at/count.js">
+
       function initReveals() {
         if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
           document.querySelectorAll("[data-reveal]").forEach((element) => {
