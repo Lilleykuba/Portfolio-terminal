@@ -72,6 +72,11 @@ export const skillGroups: SkillGroup[] = [
         level: "prakticky",
         note: "běžná práce s verzováním",
       },
+      {
+        name: "Rust",
+        level: "rozvijim"
+        note: "memory-safe backend"
+      },
     ],
   },
   {

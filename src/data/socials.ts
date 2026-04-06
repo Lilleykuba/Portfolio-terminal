@@ -30,7 +30,7 @@ export const socialLinks: SocialLink[] = [
   {
     label: "CV",
     href: "/jakubcv.pdf",
-    handle: "pdf ke stažení",
-    available: false,
+    handle: "pdf k nahlédnutí",
+    available: true,
   },
 ];
