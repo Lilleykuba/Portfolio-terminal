@@ -74,8 +74,8 @@ export const skillGroups: SkillGroup[] = [
       },
       {
         name: "Rust",
-        level: "rozvijim"
-        note: "memory-safe backend"
+        level: "rozvijim",
+        note: "memory-safe backend",
       },
     ],
   },
