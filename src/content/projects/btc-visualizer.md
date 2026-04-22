@@ -28,7 +28,7 @@ tags:
 
 ## Kontext
 
-BTC-Visualizer vznikl jako záměrně kompaktní portfolio projekt, který má ukázat víc než jen schopnost „napojit graf na API“. Cílem bylo vytvořit recruiter-friendly aplikaci, která z veřejných Bitcoin dat skládá srozumitelný příběh: cenu, cykly halvingu, stav sítě, poplatky a postupující vzácnost nabídky.
+BTC-Visualizer vznikl jako kompaktní analytická aplikace, která měla z veřejných Bitcoin dat udělat přehledný a srozumitelný produkt. Cílem nebylo ukázat co nejvíc metrik najednou, ale vybrat několik pohledů, které dávají smysl i bez hlubší znalosti trhu: cenu, cykly halvingu, stav sítě, poplatky a postupující vzácnost nabídky.
 
 Záměrně jsem se vyhnul dojmu trading terminálu nebo přeplácané crypto aplikace. Projekt měl působit klidně, čitelně a profesionálně, aby vyniklo produktové uvažování, práce s informační hierarchií a schopnost vybrat jen několik silných pohledů místo desítek průměrných metrik.
 
@@ -42,6 +42,6 @@ Na úrovni produktu jsem zvolil jen několik sekcí: market snapshot, hlavní pr
 
 ## Výsledek
 
-Výsledkem je malý, ale promyšlený open-source dashboard, který působí jako skutečný produktový side project, ne jako tutorial clone. Projekt ukazuje schopnost navrhnout čitelný interface, rozumně modelovat externí data, vybudovat udržitelnou strukturu frontendu a udělat z technických metrik něco srozumitelného i pro člověka mimo crypto komunitu.
+Výsledkem je malý, ale promyšlený open-source dashboard s důrazem na čitelnost, stabilní datový tok a klidný vizuální jazyk. Projekt ukazuje schopnost navrhnout rozumnou informační hierarchii, modelovat externí data, vybudovat udržitelnou strukturu frontendu a převést technické metriky do formy, která je srozumitelná i mimo úzkou crypto komunitu.
 
-Jako portfolio case study funguje hlavně tím, že demonstruje úsudek. Nejde o maximalizaci feature countu, ale o výběr správného rozsahu, klidný vizuální jazyk, čistý kód a realistickou implementaci nad veřejnými zdroji.
+Nejde o maximalizaci počtu funkcí, ale o správně zvolený rozsah, čistý kód a realistickou implementaci nad veřejnými zdroji.

@@ -9,39 +9,34 @@ interface Props {
 }
 
 const { project, featured = false } = Astro.props;
-const previewStack = project.data.stack.slice(0, 2).join(" / ");
 const categoryLabel = projectCategoryMeta[project.data.category].label;
-const tagsLine = project.data.tags.slice(0, 3).join(" / ");
+const previewStack = project.data.stack.slice(0, 3);
 ---
 
 <article
   class:list={["project-card", "surface", featured && "featured"]}
   data-reveal
 >
-  <div class="frame" aria-hidden="true">
-    <span>project / {project.data.year}</span>
-    <strong>{previewStack}</strong>
-  </div>
   <div class="topline">
     <span class="category">{categoryLabel}</span>
-    <span class="status">{project.data.status}</span>
+    <div class="meta-inline">
+      <span class="year">{project.data.year}</span>
+      <span class="status">{project.data.status}</span>
+    </div>
   </div>
   <div class="copy">
     <h3><a href={`/projekty/${project.id}/`}>{project.data.title}</a></h3>
     <p>{project.data.summary}</p>
   </div>
-  <dl class="specs" aria-label="Detaily projektu">
-    <div>
-      <dt>Role</dt>
-      <dd>{project.data.role}</dd>
-    </div>
-    <div>
-      <dt>Stack</dt>
-      <dd>{project.data.stack.join(" / ")}</dd>
-    </div>
-  </dl>
+  <ul class="stack-list" aria-label="Použitý stack">
+    {previewStack.map((item) => (
+      <li>{item}</li>
+    ))}
+  </ul>
+  <div class="meta-band" aria-label="Detaily projektu">
+    <span>{project.data.role}</span>
+  </div>
   <div class="bottom">
-    <p class="tags">{tagsLine}</p>
     <div class="actions">
       {project.data.github && (
         <a class="mini-link" href={project.data.github} target="_blank" rel="noreferrer">
@@ -63,57 +58,44 @@ const tagsLine = project.data.tags.slice(0, 3).join(" / ");
 <style>
   .project-card {
     display: grid;
-    gap: 1rem;
-    padding: 1.2rem;
+    gap: 0.85rem;
+    padding: 1.05rem;
     min-height: 100%;
   }
 
-  .frame {
-    display: grid;
-    gap: 0.28rem;
-    padding: 0.8rem 0.95rem;
-    border-radius: var(--radius-md);
-    border: 1px solid rgba(245, 209, 13, 0.16);
-    background:
-      linear-gradient(135deg, rgba(245, 209, 13, 0.08), transparent 58%),
-      rgba(255, 255, 255, 0.02);
+  .topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.8rem;
+    align-items: center;
+    flex-wrap: wrap;
   }
 
-  .frame span,
+  .meta-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.7rem;
+    flex-wrap: wrap;
+  }
+
   .category,
+  .year,
   .status,
-  dt,
   .mini-link,
-  .tags {
+  .stack-list li {
+    color: var(--color-text-soft);
     font-family: var(--font-mono);
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    font-size: 0.72rem;
-  }
-
-  .frame span,
-  .category,
-  dt,
-  .tags,
-  .mini-link {
-    color: var(--color-text-soft);
-  }
-
-  .frame strong {
-    font-family: var(--font-display);
-    text-transform: uppercase;
-    letter-spacing: -0.02em;
-    line-height: 1;
-    font-size: 1rem;
+    font-size: 0.7rem;
   }
 
   .project-card.featured {
     background:
-      linear-gradient(135deg, rgba(245, 209, 13, 0.08), transparent 42%),
+      linear-gradient(180deg, rgba(245, 209, 13, 0.045), transparent 28%),
       var(--color-panel-alt);
   }
 
-  .topline,
   .bottom {
     display: flex;
     justify-content: space-between;
@@ -134,9 +116,9 @@ const tagsLine = project.data.tags.slice(0, 3).join(" / ");
   h3 {
     margin: 0;
     font-family: var(--font-display);
-    text-transform: uppercase;
-    letter-spacing: -0.04em;
-    font-size: clamp(1.35rem, 2vw, 1.9rem);
+    letter-spacing: -0.03em;
+    font-size: clamp(1.18rem, 2vw, 1.48rem);
+    line-height: 1.02;
   }
 
   h3 a {
@@ -153,32 +135,27 @@ const tagsLine = project.data.tags.slice(0, 3).join(" / ");
     color: var(--color-text-muted);
   }
 
-  .specs {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0.7rem;
+  .stack-list {
+    list-style: none;
+    padding: 0;
     margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
   }
 
-  .specs div {
-    display: grid;
-    gap: 0.2rem;
+  .stack-list li {
+    padding: 0.28rem 0.46rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .meta-band {
     padding-top: 0.75rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  dt,
-  dd {
-    margin: 0;
-  }
-
-  dd {
-    font-size: 0.95rem;
-    line-height: 1.35;
-  }
-
-  .tags {
-    margin: 0;
+    color: var(--color-text-muted);
+    font-size: 0.92rem;
   }
 
   .actions {

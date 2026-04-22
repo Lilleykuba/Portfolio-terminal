@@ -1,0 +1,572 @@
+---
+import type { CollectionEntry } from "astro:content";
+
+import { projectCategoryMeta } from "@lib/content";
+
+interface Props {
+  projects: CollectionEntry<"projects">[];
+}
+
+const { projects } = Astro.props;
+---
+
+<section class="projects-carousel" data-projects-carousel data-reveal>
+  <div class="rail-head">
+    <span class="rail-meta">{projects.length} projektů</span>
+  </div>
+
+  <div class="rail-shell">
+    <button class="rail-side rail-side-left" type="button" data-rail-prev aria-label="Předchozí projekt">
+      ←
+    </button>
+
+    <div class="rail" data-rail tabindex="0" aria-label="Seznam projektů">
+      {projects.map((project) => {
+        const categoryLabel = projectCategoryMeta[project.data.category].label;
+        const previewStack = project.data.stack.slice(0, 3);
+        const hasLivePreview = Boolean(project.data.demo);
+
+        return (
+          <article class="rail-card surface">
+            <div class="rail-topline">
+              <span class="rail-category">{categoryLabel}</span>
+              <div class="rail-meta-inline">
+                <span class="rail-year">{project.data.year}</span>
+                <span class:list={["rail-state", hasLivePreview && "live"]}>
+                  {hasLivePreview ? "live" : project.data.status}
+                </span>
+              </div>
+            </div>
+
+            <div class="rail-body">
+              <h3>{project.data.title}</h3>
+              <p>{project.data.summary}</p>
+            </div>
+
+            <ul class="rail-stack" aria-label="Použitý stack">
+              {previewStack.map((item) => (
+                <li>{item}</li>
+              ))}
+            </ul>
+
+            <div class="rail-role">
+              <span>{project.data.role}</span>
+            </div>
+
+            <div class="rail-actions">
+              <a class="rail-link strong" href={`/projekty/${project.id}/`}>
+                Detail
+              </a>
+              {project.data.github && (
+                <a class="rail-link" href={project.data.github} target="_blank" rel="noreferrer">
+                  GitHub
+                </a>
+              )}
+              {project.data.demo && (
+                <button
+                  class="rail-link preview-trigger"
+                  type="button"
+                  data-preview-title={project.data.title}
+                  data-preview-url={project.data.demo}
+                >
+                  Náhled live
+                </button>
+              )}
+            </div>
+          </article>
+        );
+      })}
+    </div>
+
+    <button class="rail-side rail-side-right" type="button" data-rail-next aria-label="Další projekt">
+      →
+    </button>
+  </div>
+
+  <dialog class="preview-dialog" data-preview-dialog>
+    <div class="preview-shell surface">
+      <div class="preview-topline">
+        <div>
+          <span class="kicker">Live preview</span>
+          <h3 data-preview-heading>Náhled projektu</h3>
+        </div>
+        <div class="preview-actions">
+          <a class="rail-link" href="#" target="_blank" rel="noreferrer" data-preview-link>
+            Otevřít samostatně
+          </a>
+          <button class="preview-close" type="button" data-preview-close aria-label="Zavřít náhled">
+            ×
+          </button>
+        </div>
+      </div>
+
+      <div class="preview-frame-wrap">
+        <iframe
+          title="Náhled projektu"
+          loading="lazy"
+          referrerpolicy="no-referrer"
+          sandbox="allow-scripts allow-forms allow-same-origin"
+          data-preview-frame
+        ></iframe>
+      </div>
+    </div>
+  </dialog>
+</section>
+
+<script>
+  function initProjectsCarousel() {
+    document.querySelectorAll("[data-projects-carousel]").forEach((root) => {
+      if (!(root instanceof HTMLElement) || root.dataset.bound === "true") return;
+      root.dataset.bound = "true";
+
+      const rail = root.querySelector("[data-rail]");
+      const prev = root.querySelector("[data-rail-prev]");
+      const next = root.querySelector("[data-rail-next]");
+      const dialog = root.querySelector("[data-preview-dialog]");
+      const frame = root.querySelector("[data-preview-frame]");
+      const heading = root.querySelector("[data-preview-heading]");
+      const link = root.querySelector("[data-preview-link]");
+      const close = root.querySelector("[data-preview-close]");
+      const triggers = root.querySelectorAll("[data-preview-url]");
+
+      const getStep = () => {
+        if (!(rail instanceof HTMLElement)) return 0;
+        const card = rail.querySelector(".rail-card");
+        if (!(card instanceof HTMLElement)) return rail.clientWidth * 0.82;
+        return card.offsetWidth + 16;
+      };
+
+      const updateRailState = () => {
+        if (!(rail instanceof HTMLElement)) return;
+        const isAtStart = rail.scrollLeft <= 8;
+        const isAtEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 8;
+
+        if (prev instanceof HTMLButtonElement) {
+          prev.disabled = isAtStart;
+        }
+
+        if (next instanceof HTMLButtonElement) {
+          next.disabled = isAtEnd;
+        }
+      };
+
+      if (prev instanceof HTMLButtonElement && rail instanceof HTMLElement) {
+        prev.addEventListener("click", () => {
+          rail.scrollBy({ left: -getStep(), behavior: "smooth" });
+        });
+      }
+
+      if (next instanceof HTMLButtonElement && rail instanceof HTMLElement) {
+        next.addEventListener("click", () => {
+          rail.scrollBy({ left: getStep(), behavior: "smooth" });
+        });
+      }
+
+      if (rail instanceof HTMLElement) {
+        rail.addEventListener("scroll", updateRailState, { passive: true });
+        window.addEventListener("resize", updateRailState);
+        updateRailState();
+      }
+
+      const openPreview = (title, url) => {
+        if (
+          !(dialog instanceof HTMLDialogElement) ||
+          !(frame instanceof HTMLIFrameElement) ||
+          !(heading instanceof HTMLElement) ||
+          !(link instanceof HTMLAnchorElement)
+        ) return;
+
+        heading.textContent = title;
+        frame.src = url;
+        link.href = url;
+        if (!dialog.open) dialog.showModal();
+      };
+
+      triggers.forEach((trigger) => {
+        if (!(trigger instanceof HTMLButtonElement)) return;
+        trigger.addEventListener("click", () => {
+          const title = trigger.dataset.previewTitle ?? "Náhled projektu";
+          const url = trigger.dataset.previewUrl ?? "";
+          if (!url) return;
+          openPreview(title, url);
+        });
+      });
+
+      const closePreview = () => {
+        if (!(dialog instanceof HTMLDialogElement) || !(frame instanceof HTMLIFrameElement)) return;
+        dialog.close();
+        frame.src = "";
+      };
+
+      if (close instanceof HTMLButtonElement) {
+        close.addEventListener("click", closePreview);
+      }
+
+      if (dialog instanceof HTMLDialogElement) {
+        dialog.addEventListener("click", (event) => {
+          if (event.target === dialog) closePreview();
+        });
+        dialog.addEventListener("close", () => {
+          if (frame instanceof HTMLIFrameElement) frame.src = "";
+        });
+        dialog.addEventListener("cancel", () => {
+          if (frame instanceof HTMLIFrameElement) frame.src = "";
+        });
+      }
+    });
+  }
+
+  initProjectsCarousel();
+  document.addEventListener("astro:page-load", initProjectsCarousel);
+</script>
+
+<style>
+  .projects-carousel {
+    display: grid;
+    gap: 0.75rem;
+  }
+
+  .rail-head {
+    display: flex;
+    justify-content: flex-end;
+    padding-bottom: 0.05rem;
+  }
+
+  .rail-meta {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--color-text-soft);
+  }
+
+  .rail-shell {
+    position: relative;
+    overflow: hidden;
+  }
+
+  .rail-shell::before,
+  .rail-shell::after {
+    content: "";
+    position: absolute;
+    top: 0;
+    bottom: 0.55rem;
+    width: 3rem;
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  .rail-shell::before {
+    left: 0;
+    background: linear-gradient(90deg, var(--color-bg), transparent);
+  }
+
+  .rail-shell::after {
+    right: 0;
+    background: linear-gradient(270deg, var(--color-bg), transparent);
+  }
+
+  .rail-side {
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    z-index: 2;
+    width: 2.7rem;
+    height: 2.7rem;
+    border: 1px solid rgba(245, 209, 13, 0.22);
+    background: rgba(9, 9, 9, 0.9);
+    color: var(--color-text);
+    font-family: var(--font-mono);
+    font-size: 1rem;
+    backdrop-filter: blur(8px);
+    transition:
+      color var(--duration-fast) var(--easing),
+      border-color var(--duration-fast) var(--easing),
+      opacity var(--duration-fast) var(--easing),
+      transform var(--duration-fast) var(--easing);
+  }
+
+  .rail-side:hover,
+  .rail-side:focus-visible {
+    color: var(--color-accent);
+    border-color: rgba(245, 209, 13, 0.34);
+    transform: translateY(-50%) scale(1.02);
+  }
+
+  .rail-side:disabled {
+    opacity: 0.3;
+    pointer-events: none;
+  }
+
+  .rail-side-left {
+    left: 0.55rem;
+  }
+
+  .rail-side-right {
+    right: 0.55rem;
+  }
+
+  .rail {
+    display: grid;
+    grid-auto-flow: column;
+    grid-auto-columns: minmax(316px, 382px);
+    gap: 1rem;
+    overflow-x: auto;
+    padding: 0.1rem 4rem 0.55rem;
+    scroll-snap-type: x mandatory;
+    scroll-padding-inline: 4rem;
+    scrollbar-width: none;
+    -ms-overflow-style: none;
+  }
+
+  .rail::-webkit-scrollbar {
+    display: none;
+  }
+
+  .rail-card {
+    display: grid;
+    grid-template-rows: auto auto auto auto 1fr;
+    gap: 0.82rem;
+    padding: 1.1rem;
+    min-height: 100%;
+    scroll-snap-align: start;
+    scroll-snap-stop: always;
+    background:
+      linear-gradient(180deg, rgba(245, 209, 13, 0.05), transparent 22%),
+      var(--color-panel-alt);
+  }
+
+  .rail-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.75rem;
+    align-items: center;
+    flex-wrap: wrap;
+  }
+
+  .rail-meta-inline {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+    flex-wrap: wrap;
+  }
+
+  .rail-category,
+  .rail-year,
+  .rail-stack li,
+  .rail-link,
+  .preview-trigger {
+    color: var(--color-text-soft);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.7rem;
+  }
+
+  .rail-state {
+    padding: 0.18rem 0.42rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    color: var(--color-text-soft);
+    font-family: var(--font-mono);
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    font-size: 0.66rem;
+  }
+
+  .rail-state.live {
+    border-color: rgba(245, 209, 13, 0.24);
+    color: var(--color-accent);
+  }
+
+  .rail-body {
+    display: grid;
+    gap: 0.45rem;
+  }
+
+  .rail-body h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    letter-spacing: -0.03em;
+    font-size: clamp(1.2rem, 2vw, 1.48rem);
+    line-height: 1.03;
+  }
+
+  .rail-body p,
+  .rail-role span {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .rail-body p {
+    min-height: 4.35rem;
+  }
+
+  .rail-stack {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.45rem;
+  }
+
+  .rail-stack li {
+    padding: 0.28rem 0.46rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+  }
+
+  .rail-role {
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .rail-actions {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 0.5rem;
+    flex-wrap: wrap;
+    margin-top: auto;
+    padding-top: 0.1rem;
+  }
+
+  .rail-link,
+  .preview-trigger {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 2.2rem;
+    padding: 0.5rem 0.68rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.02);
+    cursor: pointer;
+    transition:
+      color var(--duration-fast) var(--easing),
+      border-color var(--duration-fast) var(--easing),
+      background-color var(--duration-fast) var(--easing);
+  }
+
+  .rail-link:hover,
+  .rail-link:focus-visible,
+  .preview-trigger:hover,
+  .preview-trigger:focus-visible {
+    color: var(--color-accent);
+    border-color: rgba(245, 209, 13, 0.24);
+    background: rgba(245, 209, 13, 0.06);
+  }
+
+  .rail-link.strong {
+    color: var(--color-accent);
+  }
+
+  .preview-dialog {
+    width: min(1100px, calc(100vw - 2rem));
+    max-width: none;
+    padding: 0;
+    border: 0;
+    background: transparent;
+  }
+
+  .preview-dialog::backdrop {
+    background: rgba(0, 0, 0, 0.72);
+    backdrop-filter: blur(4px);
+  }
+
+  .preview-shell {
+    padding: 1rem;
+  }
+
+  .preview-topline {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: start;
+    margin-bottom: 0.85rem;
+  }
+
+  .preview-topline h3 {
+    margin: 0.35rem 0 0;
+    font-size: 1.5rem;
+    line-height: 1.05;
+  }
+
+  .preview-actions {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+  }
+
+  .preview-close {
+    width: 2.4rem;
+    height: 2.4rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--color-text);
+    font-size: 1.45rem;
+    line-height: 1;
+  }
+
+  .preview-frame-wrap {
+    aspect-ratio: 16 / 9.5;
+    overflow: hidden;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: #0a0a0a;
+  }
+
+  .preview-frame-wrap iframe {
+    width: 100%;
+    height: 100%;
+    border: 0;
+    background: #111;
+  }
+
+  @media (max-width: 720px) {
+    .rail-head {
+      justify-content: flex-start;
+    }
+
+    .rail {
+      grid-auto-columns: minmax(284px, 86vw);
+      padding-inline: 0.25rem;
+      scroll-padding-inline: 0.25rem;
+    }
+
+    .rail-body p {
+      min-height: auto;
+    }
+
+    .rail-shell::before,
+    .rail-shell::after {
+      display: none;
+    }
+
+    .rail-side {
+      display: none;
+    }
+
+    .preview-dialog {
+      width: calc(100vw - 1rem);
+    }
+
+    .preview-shell {
+      padding: 0.7rem;
+    }
+
+    .preview-topline {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .preview-actions {
+      justify-content: space-between;
+    }
+
+    .preview-frame-wrap {
+      aspect-ratio: 10 / 13;
+    }
+  }
+</style>

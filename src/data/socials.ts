@@ -27,10 +27,4 @@ export const socialLinks: SocialLink[] = [
     handle: "jakub.lilley@gmail.com",
     available: true,
   },
-  {
-    label: "CV",
-    href: "/jakubcv.pdf",
-    handle: "pdf k nahlednuti",
-    available: true,
-  },
 ];

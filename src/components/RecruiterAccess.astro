@@ -1,0 +1,347 @@
+---
+import AvailabilityBadge from "@components/AvailabilityBadge.astro";
+import { availability, documents } from "@data/site";
+import { socialLinks } from "@data/socials";
+
+const emailLink = socialLinks.find((link) => link.label === "E-mail");
+const githubLink = socialLinks.find((link) => link.label === "GitHub");
+const linkedInLink = socialLinks.find((link) => link.label === "LinkedIn");
+
+const emailHandle = emailLink?.handle ?? "";
+const [emailUser = "", emailDomain = ""] = emailHandle.split("@");
+
+const cvHref = documents.cvHref ?? "";
+const cvKey = Array.from(cvHref)
+  .map((character, index) => character.charCodeAt(0) + 11 + (index % 4))
+  .join(".");
+const normalizedPublicKey = documents.cvPgpPublicKey.replace(/\s+/g, "").toUpperCase();
+const normalizedFingerprint = documents.cvPgpFingerprint.replace(/\s+/g, "").toUpperCase();
+---
+
+<section class="recruiter-access" data-reveal>
+  <div class="access-shell surface">
+    <div class="access-intro">
+      <span class="kicker">Kontakt</span>
+      <p class="lede">
+        LinkedIn a GitHub nechávám otevřené. E-mail zobrazím po kliknutí a CV lze otevřít
+        vložením veřejného PGP klíče nebo fingerprintu uvedeného ve footeru.
+      </p>
+      <AvailabilityBadge status={availability.status} note={availability.note} />
+    </div>
+
+    <div class="actions" aria-label="Kontakty">
+      <button
+        class="access-card primary"
+        type="button"
+        data-reveal-email
+        data-email-user={emailUser}
+        data-email-domain={emailDomain}
+      >
+        <span>E-mail</span>
+        <strong data-email-label>Zobrazit a otevřít</strong>
+      </button>
+
+      {linkedInLink && (
+        <a class="access-card" href={linkedInLink.href} target="_blank" rel="noreferrer">
+          <span>LinkedIn</span>
+          <strong>{linkedInLink.handle}</strong>
+        </a>
+      )}
+
+      {githubLink && (
+        <a class="access-card" href={githubLink.href} target="_blank" rel="noreferrer">
+          <span>GitHub</span>
+          <strong>{githubLink.handle}</strong>
+        </a>
+      )}
+    </div>
+
+    <div class="cv-gate">
+      <div class="gate-copy">
+        <span class="kicker">CV</span>
+        <p>
+          Pro otevření CV vlož veřejný PGP klíč nebo fingerprint z footeru.
+        </p>
+      </div>
+
+      <div class="gate-controls">
+        <label class="gate-field">
+          <span>Veřejný PGP klíč nebo fingerprint</span>
+          <textarea
+            rows="5"
+            spellcheck="false"
+            autocomplete="off"
+            placeholder="-----BEGIN PGP PUBLIC KEY BLOCK----- ... nebo fingerprint"
+            data-cv-pgp-input
+          ></textarea>
+        </label>
+
+        <div class="gate-actions">
+          <button
+            class="button button-primary gate-button"
+            type="button"
+            data-open-cv
+            data-cv-key={cvKey}
+            data-pgp-key={normalizedPublicKey}
+            data-pgp-fingerprint={normalizedFingerprint}
+            disabled={!documents.cvHref}
+          >
+            Otevřít CV
+          </button>
+        </div>
+      </div>
+
+      <p class="gate-status" data-cv-status>
+        Veřejný klíč i fingerprint jsou dostupné ve footeru.
+      </p>
+    </div>
+  </div>
+</section>
+
+<script>
+  function initRecruiterAccess() {
+    const root = document.querySelector(".recruiter-access");
+    if (!root || root.dataset.bound === "true") return;
+    root.dataset.bound = "true";
+
+    const emailButton = root.querySelector("[data-reveal-email]");
+    const emailLabel = root.querySelector("[data-email-label]");
+    const cvButton = root.querySelector("[data-open-cv]");
+    const pgpInput = root.querySelector("[data-cv-pgp-input]");
+    const statusLine = root.querySelector("[data-cv-status]");
+
+    const updateStatus = (message, tone = "muted") => {
+      if (!(statusLine instanceof HTMLElement)) return;
+      statusLine.textContent = message;
+      statusLine.dataset.tone = tone;
+    };
+
+    const decodeDirectPath = (key) =>
+      key
+        .split(".")
+        .filter(Boolean)
+        .map((value, index) => String.fromCharCode(Number(value) - 11 - (index % 4)))
+        .join("");
+
+    const normalize = (value) => value.replace(/\s+/g, "").toUpperCase();
+
+    if (emailButton instanceof HTMLButtonElement) {
+      emailButton.addEventListener("click", async () => {
+        const user = emailButton.dataset.emailUser ?? "";
+        const domain = emailButton.dataset.emailDomain ?? "";
+        const address = [user, domain].filter(Boolean).join("@");
+        if (!address) return;
+
+        if (emailLabel) {
+          emailLabel.textContent = address;
+        }
+
+        try {
+          await navigator.clipboard.writeText(address);
+        } catch {}
+
+        window.location.href = `mailto:${address}`;
+      });
+    }
+
+    if (
+      cvButton instanceof HTMLButtonElement &&
+      pgpInput instanceof HTMLTextAreaElement
+    ) {
+      cvButton.addEventListener("click", () => {
+        const candidate = normalize(pgpInput.value.trim());
+        const allowedKey = cvButton.dataset.pgpKey ?? "";
+        const allowedFingerprint = cvButton.dataset.pgpFingerprint ?? "";
+
+        if (!candidate) {
+          updateStatus("Vlož veřejný PGP klíč nebo fingerprint z footeru.", "error");
+          return;
+        }
+
+        if (candidate !== allowedKey && candidate !== allowedFingerprint) {
+          updateStatus("Klíč nebo fingerprint nesedí.", "error");
+          return;
+        }
+
+        const path = decodeDirectPath(cvButton.dataset.cvKey ?? "");
+        if (!path) {
+          updateStatus("CV momentálně není dostupné.", "error");
+          return;
+        }
+
+        window.open(path, "_blank", "noopener,noreferrer");
+        updateStatus("CV odemčeno. Otevírám dokument.", "success");
+      });
+    }
+  }
+
+  initRecruiterAccess();
+  document.addEventListener("astro:page-load", initRecruiterAccess);
+</script>
+
+<style>
+  .recruiter-access {
+    display: grid;
+  }
+
+  .access-shell {
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 1rem;
+    padding: 1.1rem;
+  }
+
+  .access-intro {
+    display: grid;
+    gap: 0.95rem;
+    align-content: start;
+    padding-right: 0.4rem;
+  }
+
+  .actions {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 0;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+    padding-left: 1rem;
+  }
+
+  .access-card {
+    min-height: 5rem;
+    display: grid;
+    grid-template-columns: minmax(84px, 96px) minmax(0, 1fr);
+    gap: 0.9rem;
+    align-items: center;
+    padding: 0.95rem 0;
+    border: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+    background: transparent;
+    color: var(--color-text);
+    text-align: left;
+    transition:
+      transform var(--duration-fast) var(--easing),
+      color var(--duration-fast) var(--easing);
+  }
+
+  .access-card:first-child {
+    border-top: 0;
+    padding-top: 0;
+  }
+
+  .access-card:hover,
+  .access-card:focus-visible {
+    transform: translateX(2px);
+    color: var(--color-accent);
+  }
+
+  .access-card span {
+    font-family: var(--font-mono);
+    font-size: 0.74rem;
+    text-transform: uppercase;
+    letter-spacing: 0.1em;
+    color: var(--color-text-soft);
+  }
+
+  .access-card strong {
+    font-size: 1rem;
+    line-height: 1.35;
+  }
+
+  .cv-gate {
+    grid-column: 1 / -1;
+    display: grid;
+    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .gate-copy {
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .gate-copy p,
+  .gate-status {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .gate-controls {
+    display: grid;
+    gap: 0.85rem;
+  }
+
+  .gate-field {
+    display: grid;
+    gap: 0.35rem;
+  }
+
+  .gate-field span {
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--color-text-soft);
+  }
+
+  .gate-field textarea {
+    min-height: 9rem;
+    padding: 0.8rem 0.9rem;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--color-text);
+    resize: vertical;
+    font-family: var(--font-mono);
+    line-height: 1.45;
+  }
+
+  .gate-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+  }
+
+  .gate-button {
+    min-width: 12rem;
+  }
+
+  .gate-status {
+    grid-column: 1 / -1;
+  }
+
+  .gate-status[data-tone="success"] {
+    color: var(--color-accent);
+  }
+
+  .gate-status[data-tone="error"] {
+    color: #ff8b8b;
+  }
+
+  @media (max-width: 860px) {
+    .access-shell,
+    .cv-gate {
+      grid-template-columns: 1fr;
+    }
+
+    .actions {
+      border-left: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding-left: 0;
+      padding-top: 0.8rem;
+    }
+  }
+
+  @media (max-width: 620px) {
+    .access-card {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
+    }
+
+    .gate-button {
+      min-width: 0;
+      width: 100%;
+    }
+  }
+</style>

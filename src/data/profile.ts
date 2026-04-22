@@ -3,29 +3,48 @@ export const profile = {
   location: "Brno, Česká republika",
   roleLabel: "Junior web developer / cybersecurity / HRIT",
   headline: "web developer pro web a cybersecurity",
-  headlineLines: ["Web developer"],
+  heroHeadline: {
+    lead: "Junior Web Developer",
+    bridge: "se zájmem o",
+    accent: "cybersecurity",
+    tail: "a zkušeností v HRIT / SAP SuccessFactors",
+  },
   intro:
-    "Mám pevný základ v HTML, CSS, JavaScriptu a tvorbě frontendového UI. Profesně se pohybuji kolem HRIT, zajímá mě cybersecurity a v pracovním kontextu mám kontakt se SAP SuccessFactors. Hledám roli, kde můžu spojit technický růst s prací na reálných produktech nebo interních systémech.",
+    "Mám pevný základ v HTML, CSS a JavaScriptu a tvořím čisté frontendové UI. Zajímám se o kybernetickou bezpečnost a mám pracovní kontext v HRIT a SAP SuccessFactors. Hledám juniorskou roli, kde můžu růst na reálných produktech nebo interních systémech.",
   primaryCta: {
-    label: "Otevřít terminal",
-    href: "/#terminal",
+    label: "Projekty",
+    href: "/#projects",
   },
   secondaryCta: {
-    label: "CV / kontakt",
-    href: "/#terminal-cv",
+    label: "Zobrazit CV",
+    href: "/#contact",
   },
   heroGuide: [
     { command: "summary", note: "rychlé shrnutí profilu a fitu" },
     { command: "projects", note: "vybrané projekty a detail" },
-    { command: "contact", note: "nejrychlejší způsob spojení" },
-    { command: "cv", note: "CV k nahlédnutí" },
+    { command: "certs", note: "certifikáty a další rozvoj" },
+    { command: "contact", note: "kontakt a CV pro recruitery" },
   ],
   quickFacts: [
-    { label: "Směr", value: "Web development / cybersecurity" },
-    { label: "Lokalita", value: "Brno" },
-    { label: "Praxe", value: "HRIT" },
-    { label: "Doména", value: "SAP SuccessFactors" },
-    { label: "Jazyky", value: "čeština / angličtina" },
+    { label: "Rychlý přehled", value: "" },
+    { label: "Lokalita", value: "Brno, Česká republika" },
+    { label: "Zaměření", value: "Web / Cybersecurity / HRIT" },
+    { label: "Stack", value: "HTML, CSS, JavaScript, React" },
+    { label: "Kontext", value: "SAP SuccessFactors" },
+  ],
+  focusCards: [
+    {
+      title: "Frontend základ",
+      text: "Pevný základ v HTML, CSS a JavaScriptu. Tvořím čisté a responzivní UI s důrazem na strukturu a čitelnost.",
+    },
+    {
+      title: "Bezpečnostní myšlení",
+      text: "Zajímám se o cybersecurity, základy web security a bezpečnostní návyky při návrhu i implementaci.",
+    },
+    {
+      title: "HRIT / SAP kontext",
+      text: "Mám praktický kontext v HRIT a zkušenost se SAP SuccessFactors, takže techniku nevnímám odděleně od procesů.",
+    },
   ],
   recruiterSummary:
     "Největší smysl dávám v týmu, který hledá juniorního člověka s dobrým přehledem o IT a webových technologiích, pečlivým přístupem, bezpečnostním uvažováním a ochotou rychle se učit v produktovém, interním nebo enterprise prostředí.",

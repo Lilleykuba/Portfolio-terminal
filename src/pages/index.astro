@@ -1,74 +1,132 @@
 ---
-import MiniTerminal from "@components/MiniTerminal.astro";
+import ProjectsCarousel from "@components/ProjectsCarousel.astro";
+import RecruiterAccess from "@components/RecruiterAccess.astro";
 import BaseLayout from "@layouts/BaseLayout.astro";
 import { profile } from "@data/profile";
-import { availability } from "@data/site";
-import { socialLinks } from "@data/socials";
-const emailLink = socialLinks.find((link) => link.label === "E-mail");
+import { skillGroups } from "@data/skills";
+import { getProjects } from "@lib/content";
+
+const projects = await getProjects();
+const highlightedSkillGroups = skillGroups.slice(0, 3);
+const [heroFactsHeading, ...heroFacts] = profile.quickFacts;
 ---
 
 <BaseLayout>
   <section class="hero section">
     <div class="container hero-grid">
       <div class="hero-copy" data-reveal>
-        <span class="eyebrow">Brno / web / cybersecurity</span>
-        <p class="hero-label">{profile.roleLabel}</p>
+        <span class="eyebrow">Brno / web / cybersecurity / HRIT</span>
+
         <h1 class="heading-xl hero-title" aria-label={profile.headline}>
-          {profile.headlineLines.map((line) => (
-            <span>{line}</span>
-          ))}
+          <span>{profile.heroHeadline.lead}</span>
+          <span>
+            {profile.heroHeadline.bridge}
+            <em>{profile.heroHeadline.accent}</em>
+          </span>
+          <span>{profile.heroHeadline.tail}</span>
         </h1>
+
         <p class="lede">{profile.intro}</p>
-        <div class="button-row">
+
+        <div class="hero-actions">
           <a class="button button-primary" href={profile.primaryCta.href}>{profile.primaryCta.label}</a>
           <a class="button button-secondary" href={profile.secondaryCta.href}>{profile.secondaryCta.label}</a>
         </div>
       </div>
 
       <aside class="hero-panel surface" data-reveal>
-        <div class="availability-strip">
-          <span class="kicker">Status</span>
-          <strong>{availability.status}</strong>
-        </div>
-        <div class="panel-copy">
-          <p class="panel-title">Vše důležité je níže v terminalu.</p>
-          <ul>
-            {profile.heroGuide.map((item) => (
-              <li>
-                <a class="guide-link" href={`/#terminal-${item.command}`}>
-                  <span>{item.command}</span>
-                  <strong>{item.note}</strong>
-                </a>
-              </li>
-            ))}
-          </ul>
-        </div>
-        {emailLink && (
-          <a class="hero-inline-link" href={emailLink.href}>
-            {emailLink.handle}
-          </a>
-        )}
+        <p class="hero-panel-title">{heroFactsHeading?.label}</p>
+        <ul class="fact-list" aria-label="Rychlý profil">
+          {heroFacts.map((item) => (
+            <li>
+              <span>{item.label}</span>
+              <strong>{item.value}</strong>
+            </li>
+          ))}
+        </ul>
       </aside>
     </div>
   </section>
 
-  <section class="section terminal-section" id="terminal">
+  <section class="section focus-section" id="about">
     <div class="container">
-      <MiniTerminal />
+      <div class="section-heading" data-reveal>
+        <h2 class="heading-md">Co přináším</h2>
+      </div>
+
+      <div class="focus-grid">
+        {profile.focusCards.map((item, index) => (
+          <article class="focus-card surface" data-reveal>
+            <span class="focus-index" aria-hidden="true">
+              {String(index + 1).padStart(2, "0")}
+            </span>
+            <div class="focus-copy">
+              <h3>{item.title}</h3>
+              <p>{item.text}</p>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section projects-section" id="projects">
+    <div class="container">
+      <div class="section-heading" data-reveal>
+        <div>
+          <h2 class="heading-md">Projekty</h2>
+          <p class="section-copy">Přehled prací napříč freelance, pracovním i osobním směrem.</p>
+        </div>
+      </div>
+
+      <ProjectsCarousel projects={projects} />
+    </div>
+  </section>
+
+  <section class="section skills-section" id="skills">
+    <div class="container">
+      <div class="section-heading" data-reveal>
+        <h2 class="heading-md">Dovednosti</h2>
+      </div>
+
+      <div class="skills-grid">
+        {highlightedSkillGroups.map((group) => (
+          <article class="skills-card" data-reveal>
+            <span class="skills-kicker">{group.title}</span>
+            <ul>
+              {group.items.slice(0, 4).map((item) => (
+                <li>{item.name}</li>
+              ))}
+            </ul>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <section class="section access-section" id="contact">
+    <div class="container">
+      <div class="section-heading" data-reveal>
+        <div>
+          <h2 class="heading-md">Kontakt</h2>
+          <p class="section-copy">Otevřené kontaktní kanály a přístup k CV.</p>
+        </div>
+      </div>
+      <RecruiterAccess />
     </div>
   </section>
 </BaseLayout>
 
 <style>
   .hero {
-    padding-top: 2.4rem;
+    padding-top: 3.1rem;
   }
 
   .hero-grid {
     display: grid;
-    grid-template-columns: minmax(0, 1.15fr) minmax(320px, 0.85fr);
-    gap: 0.9rem;
-    align-items: stretch;
+    grid-template-columns: minmax(0, 1.56fr) minmax(400px, 0.82fr);
+    gap: clamp(1.8rem, 3vw, 2.6rem);
+    align-items: center;
   }
 
   .hero-copy,
@@ -78,154 +136,281 @@ const emailLink = socialLinks.find((link) => link.label === "E-mail");
 
   .hero-copy {
     display: grid;
-    gap: 1.05rem;
-    padding: clamp(1.2rem, 3vw, 2rem);
-    border: 1px solid rgba(245, 209, 13, 0.18);
-    border-radius: var(--radius-lg);
-    background:
-      linear-gradient(135deg, rgba(245, 209, 13, 0.12), transparent 40%),
-      rgba(255, 255, 255, 0.02);
-    position: relative;
-  }
-
-  .hero-copy::after {
-    content: "";
-    position: absolute;
-    inset: auto 1.1rem 1.1rem auto;
-    width: 3rem;
-    height: 3rem;
-    border-right: 3px solid rgba(245, 209, 13, 0.6);
-    border-bottom: 3px solid rgba(245, 209, 13, 0.6);
-  }
-
-  .hero-label {
-    margin: 0;
-    font-family: var(--font-mono);
-    font-size: 0.84rem;
-    letter-spacing: 0.16em;
-    text-transform: uppercase;
-    color: var(--color-text-soft);
-    overflow-wrap: anywhere;
+    gap: 1.3rem;
+    align-content: start;
+    padding: clamp(0.6rem, 1.7vw, 1rem) 0;
+    max-width: 54rem;
   }
 
   .hero-title {
-    max-width: min(100%, 11.25ch);
-    font-size: clamp(2rem, 5.9vw, 4.6rem);
-    line-height: 0.9;
     display: grid;
-    justify-items: start;
-    gap: 0.12em;
-    hyphens: none;
+    gap: 0.14em;
+    max-width: 18.5ch;
+    line-height: 0.95;
+    font-size: clamp(3rem, 5.6vw, 4.95rem);
+    text-transform: none;
+    letter-spacing: -0.05em;
   }
 
   .hero-title span {
     display: block;
-    max-width: 100%;
-    white-space: nowrap;
-    word-break: normal;
-    overflow-wrap: normal;
-    hyphens: none;
+  }
+
+  .hero-title em {
+    font-style: normal;
+    color: var(--color-accent);
+  }
+
+  .hero-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-top: 0.35rem;
+  }
+
+  .hero-copy .lede {
+    max-width: 52ch;
+    font-size: clamp(1rem, 1.24vw, 1.08rem);
+    line-height: 1.55;
   }
 
   .hero-panel {
-    padding: 1.35rem;
-    display: grid;
-    gap: 1rem;
-    align-content: start;
+    padding: 1.45rem 1.5rem;
+    align-self: center;
+    max-width: 42rem;
+    justify-self: end;
+    width: 100%;
   }
 
-  .availability-strip,
-  .panel-copy,
-  .panel-copy ul {
-    display: grid;
-    gap: 0.8rem;
+  .hero-panel-title {
+    margin: 0 0 1rem;
+    font-size: clamp(1.55rem, 2vw, 1.95rem);
+    font-weight: 700;
+    letter-spacing: -0.04em;
   }
 
-  .availability-strip strong {
-    font-family: var(--font-display);
-    font-size: 1.55rem;
-    text-transform: uppercase;
-    line-height: 1;
-  }
-
-  .panel-title {
-    margin: 0;
-    font-size: 1.05rem;
-  }
-
-  .panel-copy ul {
+  .fact-list {
     list-style: none;
     padding: 0;
     margin: 0;
+    display: grid;
   }
 
-  .panel-copy li {
-    padding-top: 0.75rem;
+  .fact-list li {
+    display: grid;
+    grid-template-columns: minmax(72px, 108px) minmax(0, 1fr);
+    gap: 1rem;
+    padding: 1rem 0;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .guide-link {
-    display: grid;
-    gap: 0.2rem;
+  .fact-list li:first-child {
+    padding-top: 0;
+    border-top: 0;
   }
 
-  .guide-link:hover strong,
-  .guide-link:focus-visible strong {
-    color: var(--color-accent);
-  }
-
-  .panel-copy span {
+  .fact-list span,
+  .skills-kicker {
     font-family: var(--font-mono);
-    font-size: 0.73rem;
-    color: var(--color-text-soft);
-    text-transform: uppercase;
-    letter-spacing: 0.1em;
+    font-size: 0.75rem;
+    text-transform: none;
+    letter-spacing: 0.01em;
+    color: var(--color-text-muted);
   }
 
-  .hero-inline-link {
+  .fact-list strong {
+    font-size: 1rem;
+    line-height: 1.45;
+    font-weight: 600;
+  }
+
+  .section-heading {
+    display: grid;
+    gap: 0.45rem;
+    margin-bottom: 1.1rem;
+    position: relative;
+    padding-bottom: 0.8rem;
+  }
+
+  .section-heading :global(.heading-md) {
+    text-transform: none;
+    letter-spacing: -0.04em;
+    line-height: 1;
+  }
+
+  .section-heading::after {
+    content: "";
+    width: 3.35rem;
+    height: 2px;
+    background: var(--color-accent);
+  }
+
+  .section-copy {
+    margin: 0.2rem 0 0;
+    color: var(--color-text-muted);
+    max-width: 60ch;
+  }
+
+  .focus-grid,
+  .skills-grid {
+    display: grid;
+    gap: 1rem;
+  }
+
+  .focus-grid,
+  .skills-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+  }
+
+  .focus-card,
+  .skills-card {
+    min-width: 0;
+  }
+
+  .focus-card {
+    display: grid;
+    grid-template-columns: auto minmax(0, 1fr);
+    align-items: start;
+    gap: 1rem;
+    padding: 1.15rem 1.2rem;
+    background:
+      linear-gradient(180deg, rgba(245, 209, 13, 0.035), transparent 30%),
+      rgba(18, 18, 18, 0.95);
+  }
+
+  .focus-index {
     font-family: var(--font-mono);
     color: var(--color-accent);
     font-size: 0.82rem;
-    letter-spacing: 0.08em;
-    overflow-wrap: anywhere;
+    letter-spacing: 0.14em;
+    padding-top: 0.18rem;
   }
 
-  .terminal-section {
-    padding-top: 2.2rem;
+  .focus-copy {
+    display: grid;
+    gap: 0.45rem;
+    min-width: 0;
   }
 
-  .hero + .terminal-section {
-    border-top: 0;
-    padding-top: 1.1rem;
+  .focus-card h3 {
+    margin: 0;
+    font-size: 1.34rem;
+    line-height: 1.12;
+  }
+
+  .focus-card p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
+  .skills-grid {
+    gap: 0;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .skills-card {
+    padding: 1.15rem 1.3rem 0 1.3rem;
+    border-left: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .skills-card:first-child {
+    border-left: 0;
+    padding-left: 0;
+  }
+
+  .skills-card:last-child {
+    padding-right: 0;
+  }
+
+  .skills-card ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.9rem 0 0;
+    display: grid;
+    gap: 0.65rem;
+  }
+
+  .skills-card li {
+    color: var(--color-text-muted);
+    padding-left: 0.9rem;
+    position: relative;
+  }
+
+  .skills-card li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.7rem;
+    width: 0.3rem;
+    height: 1px;
+    background: rgba(245, 209, 13, 0.7);
+  }
+
+  @media (max-width: 1080px) {
+    .focus-grid,
+    .skills-grid {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+
+    .skills-card:nth-child(2n + 1) {
+      border-left: 0;
+      padding-left: 0;
+    }
+
+    .skills-card:nth-child(2n) {
+      padding-right: 0;
+    }
   }
 
   @media (max-width: 900px) {
     .hero-grid {
       grid-template-columns: 1fr;
+      gap: 1.8rem;
     }
-  }
 
-  @media (max-width: 780px) {
-    .hero-copy {
-      padding-right: 1.2rem;
+    .hero-title {
+      max-width: 100%;
+    }
+
+    .hero-panel {
+      max-width: 48rem;
+      justify-self: start;
     }
   }
 
   @media (max-width: 720px) {
+    .focus-grid,
+    .skills-grid {
+      grid-template-columns: 1fr;
+    }
+
     .hero-title {
+      font-size: clamp(1.95rem, 8vw, 3.3rem);
+    }
+
+    .hero-copy .lede {
       max-width: 100%;
-      font-size: clamp(1.85rem, 8vw, 3rem);
-      gap: 0.13em;
     }
 
-    .hero-title span {
-      white-space: normal;
+    .fact-list li {
+      grid-template-columns: 1fr;
+      gap: 0.35rem;
     }
-  }
 
-  @media (max-width: 560px) {
-    .hero-panel {
-      padding: 1.1rem;
+    .focus-card {
+      grid-template-columns: 1fr;
+      gap: 0.55rem;
+    }
+
+    .skills-grid {
+      border-top: 0;
+      gap: 1rem;
+    }
+
+    .skills-card {
+      border-left: 0;
+      border-top: 1px solid rgba(255, 255, 255, 0.08);
+      padding: 1rem 0 0;
     }
   }
 </style>

@@ -7,10 +7,8 @@ import { socialLinks } from "@data/socials";
 import { getFeaturedProjects, projectCategoryMeta } from "@lib/content";
 
 const featuredProjects = await getFeaturedProjects();
-const emailLink = socialLinks.find((link) => link.label === "E-mail" && link.available && link.href);
-const cvHref = documents.cvHref || emailLink?.href || "/#terminal-contact";
 const contactLinks = socialLinks.filter(
-  (link) => link.label !== "CV" && link.available && link.href,
+  (link) => !["CV", "E-mail"].includes(link.label) && link.available && link.href,
 );
 const certificateLinks = certificates
   .filter((certificate) => certificate.href)
@@ -123,12 +121,20 @@ const views = {
       "| CONTACT                                                  |",
       "+----------------------------------------------------------+",
       " prefer      : kratky e-mail nebo LinkedIn zprava",
+      " access      : kontakt a CV jsou dostupne po kliknuti niz",
     ],
-    actions: contactLinks.map((link) => ({
-      label: `${link.label.toLowerCase()} / ${link.handle}`,
-      href: link.href,
-      external: Boolean(link.external),
-    })),
+    actions: [
+      {
+        label: "open recruiter access / kontakt",
+        href: "/#contact",
+        external: false,
+      },
+      ...contactLinks.map((link) => ({
+        label: `${link.label.toLowerCase()} / ${link.handle}`,
+        href: link.href,
+        external: Boolean(link.external),
+      })),
+    ],
   },
   cv: {
     command: "cv",
@@ -142,9 +148,9 @@ const views = {
     ],
     actions: [
       {
-        label: documents.cvHref ? "otevřít CV" : "request cv",
-        href: cvHref,
-        external: Boolean(documents.cvHref),
+        label: documents.cvHref ? "open recruiter access / cv" : "request cv",
+        href: "/#contact",
+        external: false,
       },
     ],
   },

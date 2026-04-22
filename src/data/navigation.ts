@@ -1,4 +1,6 @@
 export const navigation = [
-  { label: "Domů", href: "/" },
-  { label: "Terminal", href: "/#terminal" },
+  { label: "O mně", href: "/#about" },
+  { label: "Projekty", href: "/#projects" },
+  { label: "Dovednosti", href: "/#skills" },
+  { label: "Kontakt", href: "/#contact" },
 ];

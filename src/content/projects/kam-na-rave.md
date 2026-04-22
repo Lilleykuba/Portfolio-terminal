@@ -40,4 +40,4 @@ Vedle backendu jsem řešil i vizuální identitu projektu. Homepage a detail ak
 
 Výsledkem je funkční a nasazený MVP produkt, který ověřuje konkrétní use case: jak spojit event discovery s omezeným přístupem k citlivým informacím. Projekt dobře reprezentuje můj přístup k práci, protože není postavený jen jako technické cvičení, ale jako reálný produktový experiment s jasným trade-offem mezi použitelností a soukromím.
 
-Jako portfolio case study ukazuje několik věcí najednou: schopnost navrhnout vlastní koncept, vytvořit výrazný frontend, postavit bezpečnější backend a celý projekt dotáhnout do produkčního nasazení. Zároveň je otevřený dalšímu rozvoji, například směrem k lepší správě organizátorů, jemnějším oprávněním nebo robustnějšímu auditování.
+Projekt ukazuje několik věcí najednou: schopnost navrhnout vlastní koncept, vytvořit výrazný frontend, postavit bezpečnější backend a celý produkt dotáhnout do produkčního nasazení. Zároveň zůstává otevřený dalšímu rozvoji, například směrem k lepší správě organizátorů, jemnějším oprávněním nebo robustnějšímu auditování.
