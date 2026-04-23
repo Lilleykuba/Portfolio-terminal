@@ -1,8 +1,8 @@
 export const siteMeta = {
   siteUrl: "https://lilleyjakub.cz",
-  title: "Jakub | Web developer a cybersecurity",
+  title: "Jakub | Junior IT a cybersecurity profil",
   description:
-    "Portfolio junior web developera z Brna se zájmem o frontend, cybersecurity, HRIT, SAP SuccessFactors a dobře navržené digitální systémy.",
+    "Portfolio junior IT profilu z Brna se zaměřením na cybersecurity, systémy, networking, HRIT, SAP SuccessFactors a technické webové projekty.",
   shortTitle: "Portfolio",
   locale: "cs_CZ",
   author: "Jakub",
@@ -11,6 +11,9 @@ export const siteMeta = {
     "portfolio",
     "Brno",
     "frontend",
+    "SOC",
+    "sysadmin",
+    "networking",
     "Astro",
     "SAP SuccessFactors",
     "web development",
@@ -19,14 +22,15 @@ export const siteMeta = {
 };
 
 export const availability = {
-  status: "Otevřený zajímavým rolím",
-  note: "Brno / hybrid nebo remote / web, cybersecurity a HRIT role",
+  status: "Otevřený junior IT a cyber rolím",
+  note: "Brno / hybrid nebo remote v Česku",
 };
 
 export const documents = {
   cvLabel: "CV",
-  cvHref: "/jakubcv.pdf",
-  cvNote: "CV v PDF",
+  cvHref: "/cv-ee371580.pdf",
+  cvNote: "PDF CV pro rychlé posouzení profilu",
+  cvSha256: "ee371580911f09c586d4826c653675e9f4bb901f4b6567a9172e5123bfd79f6c",
   cvPgpFingerprint: "9F42 A8C1 7E33 B4D0",
   cvPgpPublicKey: `-----BEGIN PGP PUBLIC KEY BLOCK-----
 

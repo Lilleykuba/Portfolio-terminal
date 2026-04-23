@@ -10,14 +10,14 @@ export const socialLinks: SocialLink[] = [
   {
     label: "GitHub",
     href: "https://github.com/Lilleykuba",
-    handle: "@Lilleykuba",
+    handle: "GitHub profil",
     external: true,
     available: true,
   },
   {
     label: "LinkedIn",
     href: "https://www.linkedin.com/in/jakub-lilley",
-    handle: "/in/jakub-lilley",
+    handle: "LinkedIn profil",
     external: true,
     available: true,
   },

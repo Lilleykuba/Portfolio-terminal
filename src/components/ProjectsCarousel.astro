@@ -11,101 +11,92 @@ const { projects } = Astro.props;
 ---
 
 <section class="projects-carousel" data-projects-carousel data-reveal>
-  <div class="rail-head">
-    <span class="rail-meta">{projects.length} projektů</span>
+  <div class="carousel-head">
+    <div>
+      <span class="kicker">Vybrané práce</span>
+    </div>
+    <div class="carousel-controls" aria-label="Ovládání projektů">
+      <span class="carousel-count" data-carousel-count>
+        01 / {String(projects.length).padStart(2, "0")}
+      </span>
+      <button type="button" data-carousel-prev aria-label="Předchozí projekt">←</button>
+      <button type="button" data-carousel-next aria-label="Další projekt">→</button>
+    </div>
   </div>
 
   <div class="rail-shell">
-    <button class="rail-side rail-side-left" type="button" data-rail-prev aria-label="Předchozí projekt">
-      ←
-    </button>
-
-    <div class="rail" data-rail tabindex="0" aria-label="Seznam projektů">
+    <div class="rail" data-carousel-rail tabindex="0" aria-label="Seznam projektů">
       {projects.map((project) => {
         const categoryLabel = projectCategoryMeta[project.data.category].label;
-        const previewStack = project.data.stack.slice(0, 3);
-        const hasLivePreview = Boolean(project.data.demo);
+        const previewStack = project.data.stack.slice(0, 4);
 
         return (
-          <article class="rail-card surface">
-            <div class="rail-topline">
-              <span class="rail-category">{categoryLabel}</span>
-              <div class="rail-meta-inline">
-                <span class="rail-year">{project.data.year}</span>
-                <span class:list={["rail-state", hasLivePreview && "live"]}>
-                  {hasLivePreview ? "live" : project.data.status}
-                </span>
-              </div>
+          <article class="project-card surface" data-project-card>
+            <div class="card-topline">
+              <span>{categoryLabel}</span>
+              <span>{project.data.year}</span>
+              <span>{project.data.status}</span>
             </div>
 
-            <div class="rail-body">
+            <div class="card-body">
               <h3>{project.data.title}</h3>
               <p>{project.data.summary}</p>
             </div>
 
-            <ul class="rail-stack" aria-label="Použitý stack">
+            <p class="project-role">{project.data.role}</p>
+
+            <ul class="stack-list" aria-label="Použitý stack">
               {previewStack.map((item) => (
                 <li>{item}</li>
               ))}
             </ul>
 
-            <div class="rail-role">
-              <span>{project.data.role}</span>
-            </div>
-
-            <div class="rail-actions">
-              <a class="rail-link strong" href={`/projekty/${project.id}/`}>
-                Detail
-              </a>
-              {project.data.github && (
-                <a class="rail-link" href={project.data.github} target="_blank" rel="noreferrer">
-                  GitHub
-                </a>
-              )}
+            <div class="card-actions">
+              <a class="card-link strong" href={`/projekty/${project.id}/`}>Detail</a>
               {project.data.demo && (
                 <button
-                  class="rail-link preview-trigger"
+                  class="card-link"
                   type="button"
                   data-preview-title={project.data.title}
                   data-preview-url={project.data.demo}
                 >
-                  Náhled live
+                  Live ukázka
                 </button>
+              )}
+              {project.data.github && (
+                <a class="card-link" href={project.data.github} target="_blank" rel="noreferrer">
+                  GitHub
+                </a>
               )}
             </div>
           </article>
         );
       })}
     </div>
-
-    <button class="rail-side rail-side-right" type="button" data-rail-next aria-label="Další projekt">
-      →
-    </button>
   </div>
 
   <dialog class="preview-dialog" data-preview-dialog>
     <div class="preview-shell surface">
       <div class="preview-topline">
         <div>
-          <span class="kicker">Live preview</span>
+          <span class="kicker">Live ukázka</span>
           <h3 data-preview-heading>Náhled projektu</h3>
         </div>
         <div class="preview-actions">
-          <a class="rail-link" href="#" target="_blank" rel="noreferrer" data-preview-link>
-            Otevřít samostatně
+          <a class="card-link" href="#" target="_blank" rel="noreferrer" data-preview-link>
+            Otevřít venku
           </a>
           <button class="preview-close" type="button" data-preview-close aria-label="Zavřít náhled">
             ×
           </button>
         </div>
       </div>
-
       <div class="preview-frame-wrap">
         <iframe
-          title="Náhled projektu"
+          title="Live náhled projektu"
           loading="lazy"
           referrerpolicy="no-referrer"
-          sandbox="allow-scripts allow-forms allow-same-origin"
+          sandbox="allow-scripts allow-forms allow-same-origin allow-popups"
           data-preview-frame
         ></iframe>
       </div>
@@ -114,89 +105,107 @@ const { projects } = Astro.props;
 </section>
 
 <script>
-  function initProjectsCarousel() {
+  function initProjectCarousel() {
     document.querySelectorAll("[data-projects-carousel]").forEach((root) => {
       if (!(root instanceof HTMLElement) || root.dataset.bound === "true") return;
       root.dataset.bound = "true";
 
-      const rail = root.querySelector("[data-rail]");
-      const prev = root.querySelector("[data-rail-prev]");
-      const next = root.querySelector("[data-rail-next]");
+      const rail = root.querySelector("[data-carousel-rail]");
+      const prev = root.querySelector("[data-carousel-prev]");
+      const next = root.querySelector("[data-carousel-next]");
+      const count = root.querySelector("[data-carousel-count]");
+      const cards = Array.from(root.querySelectorAll("[data-project-card]"));
       const dialog = root.querySelector("[data-preview-dialog]");
       const frame = root.querySelector("[data-preview-frame]");
       const heading = root.querySelector("[data-preview-heading]");
-      const link = root.querySelector("[data-preview-link]");
+      const previewLink = root.querySelector("[data-preview-link]");
       const close = root.querySelector("[data-preview-close]");
-      const triggers = root.querySelectorAll("[data-preview-url]");
+      const previewTriggers = root.querySelectorAll("[data-preview-url]");
+      const total = cards.length;
+
+      if (!(rail instanceof HTMLElement) || total === 0) return;
+
+      const format = (value) => String(value).padStart(2, "0");
 
       const getStep = () => {
-        if (!(rail instanceof HTMLElement)) return 0;
-        const card = rail.querySelector(".rail-card");
-        if (!(card instanceof HTMLElement)) return rail.clientWidth * 0.82;
-        return card.offsetWidth + 16;
+        const firstCard = cards[0];
+        if (!(firstCard instanceof HTMLElement)) return rail.clientWidth;
+        const styles = window.getComputedStyle(rail);
+        const gap = Number.parseFloat(styles.columnGap || styles.gap || "0");
+        return firstCard.offsetWidth + gap;
       };
 
-      const updateRailState = () => {
-        if (!(rail instanceof HTMLElement)) return;
-        const isAtStart = rail.scrollLeft <= 8;
-        const isAtEnd = rail.scrollLeft + rail.clientWidth >= rail.scrollWidth - 8;
-
-        if (prev instanceof HTMLButtonElement) {
-          prev.disabled = isAtStart;
-        }
-
-        if (next instanceof HTMLButtonElement) {
-          next.disabled = isAtEnd;
-        }
+      const getActiveIndex = () => {
+        const step = getStep();
+        if (!step) return 0;
+        return Math.min(total - 1, Math.max(0, Math.round(rail.scrollLeft / step)));
       };
 
-      if (prev instanceof HTMLButtonElement && rail instanceof HTMLElement) {
-        prev.addEventListener("click", () => {
-          rail.scrollBy({ left: -getStep(), behavior: "smooth" });
-        });
+      const update = () => {
+        const index = getActiveIndex();
+        if (count instanceof HTMLElement) {
+          count.textContent = `${format(index + 1)} / ${format(total)}`;
+        }
+        if (prev instanceof HTMLButtonElement) prev.disabled = index === 0;
+        if (next instanceof HTMLButtonElement) next.disabled = index === total - 1;
+      };
+
+      const goTo = (index) => {
+        const target = Math.min(total - 1, Math.max(0, index));
+        rail.scrollTo({ left: getStep() * target, behavior: "smooth" });
+      };
+
+      if (prev instanceof HTMLButtonElement) {
+        prev.addEventListener("click", () => goTo(getActiveIndex() - 1));
       }
 
-      if (next instanceof HTMLButtonElement && rail instanceof HTMLElement) {
-        next.addEventListener("click", () => {
-          rail.scrollBy({ left: getStep(), behavior: "smooth" });
-        });
+      if (next instanceof HTMLButtonElement) {
+        next.addEventListener("click", () => goTo(getActiveIndex() + 1));
       }
 
-      if (rail instanceof HTMLElement) {
-        rail.addEventListener("scroll", updateRailState, { passive: true });
-        window.addEventListener("resize", updateRailState);
-        updateRailState();
-      }
+      rail.addEventListener("keydown", (event) => {
+        if (event.key === "ArrowLeft") {
+          event.preventDefault();
+          goTo(getActiveIndex() - 1);
+        }
+
+        if (event.key === "ArrowRight") {
+          event.preventDefault();
+          goTo(getActiveIndex() + 1);
+        }
+      });
+
+      rail.addEventListener("scroll", update, { passive: true });
+      window.addEventListener("resize", update);
+
+      const closePreview = () => {
+        if (!(dialog instanceof HTMLDialogElement)) return;
+        dialog.close();
+        if (frame instanceof HTMLIFrameElement) frame.src = "";
+      };
 
       const openPreview = (title, url) => {
         if (
           !(dialog instanceof HTMLDialogElement) ||
           !(frame instanceof HTMLIFrameElement) ||
           !(heading instanceof HTMLElement) ||
-          !(link instanceof HTMLAnchorElement)
+          !(previewLink instanceof HTMLAnchorElement)
         ) return;
 
         heading.textContent = title;
         frame.src = url;
-        link.href = url;
+        previewLink.href = url;
         if (!dialog.open) dialog.showModal();
       };
 
-      triggers.forEach((trigger) => {
+      previewTriggers.forEach((trigger) => {
         if (!(trigger instanceof HTMLButtonElement)) return;
         trigger.addEventListener("click", () => {
           const title = trigger.dataset.previewTitle ?? "Náhled projektu";
           const url = trigger.dataset.previewUrl ?? "";
-          if (!url) return;
-          openPreview(title, url);
+          if (url) openPreview(title, url);
         });
       });
-
-      const closePreview = () => {
-        if (!(dialog instanceof HTMLDialogElement) || !(frame instanceof HTMLIFrameElement)) return;
-        dialog.close();
-        frame.src = "";
-      };
 
       if (close instanceof HTMLButtonElement) {
         close.addEventListener("click", closePreview);
@@ -213,108 +222,97 @@ const { projects } = Astro.props;
           if (frame instanceof HTMLIFrameElement) frame.src = "";
         });
       }
+
+      update();
     });
   }
 
-  initProjectsCarousel();
-  document.addEventListener("astro:page-load", initProjectsCarousel);
+  initProjectCarousel();
+  document.addEventListener("astro:page-load", initProjectCarousel);
 </script>
 
 <style>
   .projects-carousel {
     display: grid;
-    gap: 0.75rem;
+    gap: 0.9rem;
   }
 
-  .rail-head {
+  .carousel-head {
     display: flex;
-    justify-content: flex-end;
-    padding-bottom: 0.05rem;
+    justify-content: space-between;
+    gap: 1rem;
+    align-items: center;
   }
 
-  .rail-meta {
+  .carousel-controls {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.55rem;
+  }
+
+  .carousel-count {
+    min-width: 4.8rem;
+    color: var(--color-text-soft);
     font-family: var(--font-mono);
     font-size: 0.72rem;
     letter-spacing: 0.08em;
-    text-transform: uppercase;
-    color: var(--color-text-soft);
+  }
+
+  .carousel-controls button {
+    display: grid;
+    place-items: center;
+    width: 2.35rem;
+    aspect-ratio: 1;
+    border: 1px solid rgba(245, 209, 13, 0.22);
+    border-radius: var(--radius-sm);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--color-text);
+    cursor: pointer;
+    transition:
+      color var(--duration-fast) var(--easing),
+      border-color var(--duration-fast) var(--easing),
+      background-color var(--duration-fast) var(--easing),
+      transform var(--duration-fast) var(--easing);
+  }
+
+  .carousel-controls button:hover,
+  .carousel-controls button:focus-visible {
+    color: var(--color-accent);
+    border-color: rgba(245, 209, 13, 0.38);
+    background: rgba(245, 209, 13, 0.06);
+    transform: translateY(-1px);
+  }
+
+  .carousel-controls button:disabled {
+    opacity: 0.35;
+    pointer-events: none;
   }
 
   .rail-shell {
-    position: relative;
     overflow: hidden;
+    position: relative;
   }
 
-  .rail-shell::before,
   .rail-shell::after {
     content: "";
     position: absolute;
     top: 0;
-    bottom: 0.55rem;
-    width: 3rem;
-    pointer-events: none;
-    z-index: 1;
-  }
-
-  .rail-shell::before {
-    left: 0;
-    background: linear-gradient(90deg, var(--color-bg), transparent);
-  }
-
-  .rail-shell::after {
     right: 0;
-    background: linear-gradient(270deg, var(--color-bg), transparent);
-  }
-
-  .rail-side {
-    position: absolute;
-    top: 50%;
-    transform: translateY(-50%);
-    z-index: 2;
-    width: 2.7rem;
-    height: 2.7rem;
-    border: 1px solid rgba(245, 209, 13, 0.22);
-    background: rgba(9, 9, 9, 0.9);
-    color: var(--color-text);
-    font-family: var(--font-mono);
-    font-size: 1rem;
-    backdrop-filter: blur(8px);
-    transition:
-      color var(--duration-fast) var(--easing),
-      border-color var(--duration-fast) var(--easing),
-      opacity var(--duration-fast) var(--easing),
-      transform var(--duration-fast) var(--easing);
-  }
-
-  .rail-side:hover,
-  .rail-side:focus-visible {
-    color: var(--color-accent);
-    border-color: rgba(245, 209, 13, 0.34);
-    transform: translateY(-50%) scale(1.02);
-  }
-
-  .rail-side:disabled {
-    opacity: 0.3;
+    bottom: 0.55rem;
+    width: clamp(2rem, 7vw, 5rem);
     pointer-events: none;
-  }
-
-  .rail-side-left {
-    left: 0.55rem;
-  }
-
-  .rail-side-right {
-    right: 0.55rem;
+    background: linear-gradient(270deg, var(--color-bg), transparent);
   }
 
   .rail {
     display: grid;
     grid-auto-flow: column;
-    grid-auto-columns: minmax(316px, 382px);
+    grid-auto-columns: clamp(620px, 78vw, 820px);
     gap: 1rem;
     overflow-x: auto;
-    padding: 0.1rem 4rem 0.55rem;
+    padding: 0.1rem clamp(2rem, 12vw, 10rem) 0.7rem 0.1rem;
     scroll-snap-type: x mandatory;
-    scroll-padding-inline: 4rem;
+    scroll-padding-left: 0.1rem;
     scrollbar-width: none;
     -ms-overflow-style: none;
   }
@@ -323,39 +321,28 @@ const { projects } = Astro.props;
     display: none;
   }
 
-  .rail-card {
+  .project-card {
+    min-height: 22rem;
     display: grid;
-    grid-template-rows: auto auto auto auto 1fr;
-    gap: 0.82rem;
-    padding: 1.1rem;
-    min-height: 100%;
+    grid-template-rows: auto 1fr auto auto auto;
+    gap: 1rem;
+    padding: clamp(1rem, 2.5vw, 1.35rem);
     scroll-snap-align: start;
     scroll-snap-stop: always;
     background:
-      linear-gradient(180deg, rgba(245, 209, 13, 0.05), transparent 22%),
+      linear-gradient(135deg, rgba(245, 209, 13, 0.07), transparent 34%),
       var(--color-panel-alt);
   }
 
-  .rail-topline {
+  .card-topline {
     display: flex;
-    justify-content: space-between;
-    gap: 0.75rem;
-    align-items: center;
     flex-wrap: wrap;
+    gap: 0.45rem;
   }
 
-  .rail-meta-inline {
-    display: inline-flex;
-    align-items: center;
-    gap: 0.55rem;
-    flex-wrap: wrap;
-  }
-
-  .rail-category,
-  .rail-year,
-  .rail-stack li,
-  .rail-link,
-  .preview-trigger {
+  .card-topline span,
+  .stack-list li,
+  .card-link {
     color: var(--color-text-soft);
     font-family: var(--font-mono);
     text-transform: uppercase;
@@ -363,45 +350,45 @@ const { projects } = Astro.props;
     font-size: 0.7rem;
   }
 
-  .rail-state {
-    padding: 0.18rem 0.42rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    color: var(--color-text-soft);
-    font-family: var(--font-mono);
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-    font-size: 0.66rem;
+  .card-topline span {
+    padding: 0.24rem 0.44rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.025);
   }
 
-  .rail-state.live {
-    border-color: rgba(245, 209, 13, 0.24);
-    color: var(--color-accent);
-  }
-
-  .rail-body {
+  .card-body {
     display: grid;
-    gap: 0.45rem;
+    gap: 0.65rem;
+    align-content: center;
+    max-width: 52rem;
   }
 
-  .rail-body h3 {
+  .card-body h3 {
     margin: 0;
     font-family: var(--font-display);
-    letter-spacing: -0.03em;
-    font-size: clamp(1.2rem, 2vw, 1.48rem);
-    line-height: 1.03;
+    font-size: clamp(2rem, 4.1vw, 3.45rem);
+    line-height: 1.02;
+    letter-spacing: 0;
+    max-width: 13ch;
   }
 
-  .rail-body p,
-  .rail-role span {
+  .card-body p,
+  .project-role {
     margin: 0;
     color: var(--color-text-muted);
   }
 
-  .rail-body p {
-    min-height: 4.35rem;
+  .card-body p {
+    max-width: 54ch;
+    font-size: clamp(1rem, 1.4vw, 1.1rem);
   }
 
-  .rail-stack {
+  .project-role {
+    padding-top: 0.8rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .stack-list {
     list-style: none;
     padding: 0;
     margin: 0;
@@ -410,35 +397,24 @@ const { projects } = Astro.props;
     gap: 0.45rem;
   }
 
-  .rail-stack li {
+  .stack-list li {
     padding: 0.28rem 0.46rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.02);
   }
 
-  .rail-role {
-    padding-top: 0.75rem;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-  }
-
-  .rail-actions {
+  .card-actions {
     display: flex;
-    align-items: center;
-    justify-content: flex-start;
-    gap: 0.5rem;
     flex-wrap: wrap;
-    margin-top: auto;
-    padding-top: 0.1rem;
+    gap: 0.55rem;
   }
 
-  .rail-link,
-  .preview-trigger {
+  .card-link {
     display: inline-flex;
     align-items: center;
-    justify-content: center;
-    min-height: 2.2rem;
-    padding: 0.5rem 0.68rem;
+    min-height: 2.25rem;
+    padding: 0.52rem 0.7rem;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: rgba(255, 255, 255, 0.02);
     cursor: pointer;
@@ -448,21 +424,19 @@ const { projects } = Astro.props;
       background-color var(--duration-fast) var(--easing);
   }
 
-  .rail-link:hover,
-  .rail-link:focus-visible,
-  .preview-trigger:hover,
-  .preview-trigger:focus-visible {
+  .card-link.strong {
     color: var(--color-accent);
-    border-color: rgba(245, 209, 13, 0.24);
-    background: rgba(245, 209, 13, 0.06);
   }
 
-  .rail-link.strong {
+  .card-link:hover,
+  .card-link:focus-visible {
     color: var(--color-accent);
+    border-color: rgba(245, 209, 13, 0.24);
+    background: rgba(245, 209, 13, 0.055);
   }
 
   .preview-dialog {
-    width: min(1100px, calc(100vw - 2rem));
+    width: min(1120px, calc(100vw - 2rem));
     max-width: none;
     padding: 0;
     border: 0;
@@ -470,12 +444,12 @@ const { projects } = Astro.props;
   }
 
   .preview-dialog::backdrop {
-    background: rgba(0, 0, 0, 0.72);
+    background: rgba(0, 0, 0, 0.76);
     backdrop-filter: blur(4px);
   }
 
   .preview-shell {
-    padding: 1rem;
+    padding: clamp(0.75rem, 2vw, 1rem);
   }
 
   .preview-topline {
@@ -488,30 +462,35 @@ const { projects } = Astro.props;
 
   .preview-topline h3 {
     margin: 0.35rem 0 0;
-    font-size: 1.5rem;
-    line-height: 1.05;
+    font-size: clamp(1.25rem, 2.4vw, 1.75rem);
+    line-height: 1;
+    letter-spacing: 0;
   }
 
   .preview-actions {
     display: inline-flex;
     align-items: center;
-    gap: 0.75rem;
+    gap: 0.7rem;
     flex-wrap: wrap;
     justify-content: flex-end;
   }
 
   .preview-close {
-    width: 2.4rem;
-    height: 2.4rem;
+    display: grid;
+    place-items: center;
+    width: 2.35rem;
+    aspect-ratio: 1;
     border: 1px solid rgba(255, 255, 255, 0.1);
+    border-radius: var(--radius-sm);
     background: rgba(255, 255, 255, 0.02);
     color: var(--color-text);
-    font-size: 1.45rem;
+    font-size: 1.35rem;
     line-height: 1;
+    cursor: pointer;
   }
 
   .preview-frame-wrap {
-    aspect-ratio: 16 / 9.5;
+    aspect-ratio: 16 / 9.4;
     overflow: hidden;
     border: 1px solid rgba(255, 255, 255, 0.08);
     background: #0a0a0a;
@@ -525,43 +504,34 @@ const { projects } = Astro.props;
   }
 
   @media (max-width: 720px) {
-    .rail-head {
-      justify-content: flex-start;
+    .carousel-head {
+      align-items: flex-start;
+      flex-direction: column;
     }
 
     .rail {
-      grid-auto-columns: minmax(284px, 86vw);
-      padding-inline: 0.25rem;
-      scroll-padding-inline: 0.25rem;
+      grid-auto-columns: minmax(292px, 88vw);
+      padding-right: 0.25rem;
     }
 
-    .rail-body p {
-      min-height: auto;
-    }
-
-    .rail-shell::before,
     .rail-shell::after {
       display: none;
     }
 
-    .rail-side {
-      display: none;
+    .project-card {
+      min-height: 24rem;
     }
 
     .preview-dialog {
       width: calc(100vw - 1rem);
     }
 
-    .preview-shell {
-      padding: 0.7rem;
-    }
-
     .preview-topline {
-      align-items: stretch;
       flex-direction: column;
     }
 
     .preview-actions {
+      width: 100%;
       justify-content: space-between;
     }
 

@@ -195,7 +195,7 @@ select {
   line-height: 0.95;
   text-transform: uppercase;
   font-family: var(--font-display);
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
 }
 
 .heading-xl {
@@ -315,7 +315,7 @@ select {
 .prose h3 {
   font-family: var(--font-display);
   text-transform: uppercase;
-  letter-spacing: -0.04em;
+  letter-spacing: 0;
   line-height: 1;
   color: var(--color-text);
   margin-top: 2.3rem;

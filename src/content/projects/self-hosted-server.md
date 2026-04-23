@@ -1,18 +1,26 @@
 ---
 category: "personal"
 title: "Self-hosted home server"
-summary: "Vlastní on-premise home server pro snížení závislosti na centralizovaných aplikacích."
-description: "Projekt zahrnuje setup linux serveru, reverse proxy, VPN meshnet setup, DNS filtering a maintanence"
+summary: "Domácí Linux server pro self-hosted aplikace, zálohy, DNS filtering a VPN přístup."
+description: "Praktický infrastrukturový projekt zaměřený na Linux, Docker, reverse proxy, VPN meshnet, DNS filtering a každodenní údržbu vlastních služeb."
+problem: "Cílem bylo snížit závislost na centralizovaných aplikacích a získat větší kontrolu nad osobními daty, zálohami a provozem služeb."
+solution: "Postupný setup Linux serveru, VM prostředí, Docker Compose služeb, Nginx reverse proxy, WireGuard meshnetu a Pi-hole DNS filtru."
+impact: "Projekt dokládá praktický security mindset a ochotu řešit provozní detaily, síťové souvislosti a údržbu vlastních služeb."
+highlights:
+  - "Linux server a VM prostředí pro vlastní služby"
+  - "Docker Compose pro nasazení a správu aplikací"
+  - "Nginx reverse proxy a VPN meshnet přes WireGuard"
+  - "Pi-hole DNS filtering a denně používané zálohy"
 proof: "Ukazuje security mindset, disciplínu v práci s informacemi a schopnost převádět učení do použitelné struktury."
 stack:
   - Docker
   - PiHole
   - Nginx
-role: "HW setup, VM setup, networking, docker deployment, maintanence"
+role: "Linux server, VM, networking, Docker, údržba"
 featured: true
 year: 2025
 status: "Home server"
-order: 2
+order: 5
 tags:
   - self-hosting
   - virtualization

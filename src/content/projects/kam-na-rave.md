@@ -1,21 +1,31 @@
 ---
 category: "personal"
 title: "Kam na Rave"
-summary: "Live MVP pro sdílení hudebních akcí."
-description: "Web minimalizuje sběr metadat a implementuje jednoduchou kryptografii."
-proof: "Ukazuje kreativitu v tvorbě UI, schopnost postavit funkční backend a zájem o kryptografii."
+summary: "Privacy-aware MVP pro sdílení hudebních akcí s uzamčenými detaily lokace."
+description: "Produktový experiment, který kombinuje výrazné UI, databázový backend, validaci, hashování odemykacích kódů, šifrovaný payload a jednoduchý rate limiting."
+problem: "Menší komunitní akce potřebují být dohledatelné, ale ne vždy chtějí veřejně vystavit přesnou lokaci a instrukce."
+solution: "Veřejná část ukazuje jen bezpečný kontext akce. Citlivější instrukce se odemykají kódem, který je uložený odděleně od šifrovaného payloadu."
+impact: "Projekt působí jako reálný MVP produkt: má jasný use case, produkční nasazení, admin flow a konkrétní bezpečnostní trade-offy."
+highlights:
+  - "Astro SSR aplikace nasazená na Netlify"
+  - "PostgreSQL databáze přes Supabase a Drizzle ORM"
+  - "scrypt pro hashování kódů a AES-256-GCM pro citlivý payload"
+  - "Zod validace a jednoduchý rate limiting unlock endpointu"
+proof: "Ukazuje schopnost postavit produkt, který řeší konkrétní problém, a zároveň přemýšlet o soukromí, backendu i frontendové atmosféře."
 stack:
   - Astro
-  - Crypto
+  - TypeScript
   - Supabase
+  - Drizzle ORM
   - PostgreSQL
-role: "Design, development, deployment"
+  - Crypto
+role: "Koncept, UI, backend, databáze, šifrování, nasazení"
 featured: true
 year: 2026
 status: "V aktivním vývoji"
 github: "https://github.com/Lilleykuba/RaveMap"
 demo: "https://kamnarave.netlify.app"
-order: 4
+order: 1
 tags:
   - web app
   - encryption

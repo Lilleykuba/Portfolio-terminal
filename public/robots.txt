@@ -1,5 +1,6 @@
 User-agent: *
 Allow: /
 Disallow: /jakubcv.pdf
+Disallow: /*.pdf$
 
 Sitemap: https://term-portfolio.netlify.app/sitemap-index.xml

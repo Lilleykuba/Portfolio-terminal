@@ -3,7 +3,15 @@ category: "personal"
 title: "BTC-Visualizer"
 summary: "Dashboard, který převádí veřejná Bitcoin data do přehledné analytické aplikace."
 description: "Aplikace kombinuje tržní, síťové a emisní metriky Bitcoinu do několika kurátorovaných pohledů. Důraz je na čitelnost, práci s veřejnými API, transformaci dat, graceful degradation a Astro architekturu s minimem klientského JavaScriptu."
-proof: "Ukazuje produktové uvažování, práci s veřejnými daty, datovou vizualizaci, čistou frontend architekturu a schopnost postavit malý, ale přesvědčivý open-source projekt."
+problem: "Bitcoin data jsou veřejná, ale často roztroušená, technická a prezentovaná buď jako trading terminál, nebo jako nepřehledný seznam metrik."
+solution: "Dashboard vybírá menší počet smysluplných pohledů, validuje externí data a interaktivitu drží jen v React islands pro grafy."
+impact: "Projekt ukazuje produktové rozhodování, datový model, práci s chybovými stavy a schopnost udělat technické téma čitelné i pro netradera."
+highlights:
+  - "Astro-first architektura s minimem klientského JavaScriptu"
+  - "adaptery pro veřejná API a validace odpovědí přes Zod"
+  - "partial-data stavy a graceful degradation při výpadku zdrojů"
+  - "kurátorované pohledy na cenu, halving, síť, scarcity a drawdown"
+proof: "Ukazuje práci s veřejnými daty, validací odpovědí, fallback stavy, datovou vizualizaci a schopnost postavit malý, ale přesvědčivý open-source projekt."
 stack:
   - Astro
   - TypeScript
@@ -11,13 +19,13 @@ stack:
   - React Islands
   - Recharts
   - Zod
-role: "Product design, frontend development, data integration, UI architecture"
+role: "Návrh produktu, datová integrace, UI, nasazení"
 featured: true
 year: 2026
 status: "V aktivním vývoji"
 github: "https://github.com/Lilleykuba/BTC-Visualizer"
 demo: "https://btc-visualizer.netlify.app"
-order: 5
+order: 2
 tags:
   - web app
   - data visualization

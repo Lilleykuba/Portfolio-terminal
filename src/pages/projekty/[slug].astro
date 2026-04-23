@@ -34,6 +34,26 @@ const previewStack = project.data.stack.slice(0, 4);
         <h1 class="heading-lg">{project.data.title}</h1>
         <p class="lede">{project.data.summary}</p>
         <p class="description">{project.data.description}</p>
+        <div class="case-summary" aria-label="Shrnutí případové studie">
+          {project.data.problem && (
+            <article>
+              <span>Problém</span>
+              <p>{project.data.problem}</p>
+            </article>
+          )}
+          {project.data.solution && (
+            <article>
+              <span>Řešení</span>
+              <p>{project.data.solution}</p>
+            </article>
+          )}
+          {project.data.impact && (
+            <article>
+              <span>Signál</span>
+              <p>{project.data.impact}</p>
+            </article>
+          )}
+        </div>
         <ul class="stack-list" aria-label="Použitý stack">
           {previewStack.map((item) => (
             <li>{item}</li>
@@ -59,6 +79,16 @@ const previewStack = project.data.stack.slice(0, 4);
             <div>
               <span class="meta-label">Projekt ukazuje</span>
               <strong>{project.data.proof}</strong>
+            </div>
+          )}
+          {project.data.highlights.length > 0 && (
+            <div>
+              <span class="meta-label">Technické body</span>
+              <ul class="meta-list">
+                {project.data.highlights.map((item) => (
+                  <li>{item}</li>
+                ))}
+              </ul>
             </div>
           )}
           {project.data.learning && (
@@ -151,6 +181,33 @@ const previewStack = project.data.stack.slice(0, 4);
     color: var(--color-text-muted);
   }
 
+  .case-summary {
+    display: grid;
+    gap: 0.75rem;
+    margin-top: 0.2rem;
+  }
+
+  .case-summary article {
+    display: grid;
+    grid-template-columns: 7.4rem minmax(0, 1fr);
+    gap: 0.8rem;
+    padding-top: 0.75rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .case-summary span {
+    color: var(--color-accent);
+    font-family: var(--font-mono);
+    font-size: 0.72rem;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+  }
+
+  .case-summary p {
+    margin: 0;
+    color: var(--color-text-muted);
+  }
+
   .meta,
   .article {
     padding: 1.15rem;
@@ -176,6 +233,30 @@ const previewStack = project.data.stack.slice(0, 4);
   .meta-grid > div:first-child {
     padding-top: 0;
     border-top: 0;
+  }
+
+  .meta-list {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+    display: grid;
+    gap: 0.55rem;
+  }
+
+  .meta-list li {
+    color: var(--color-text-muted);
+    padding-left: 1rem;
+    position: relative;
+  }
+
+  .meta-list li::before {
+    content: "";
+    position: absolute;
+    left: 0;
+    top: 0.72rem;
+    width: 0.34rem;
+    height: 1px;
+    background: var(--color-accent);
   }
 
   .meta-label {
@@ -222,6 +303,13 @@ const previewStack = project.data.stack.slice(0, 4);
   @media (max-width: 900px) {
     .detail-grid {
       grid-template-columns: 1fr;
+    }
+  }
+
+  @media (max-width: 640px) {
+    .case-summary article {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
     }
   }
 </style>

@@ -6,40 +6,42 @@ import { socialLinks } from "@data/socials";
 const emailLink = socialLinks.find((link) => link.label === "E-mail");
 const githubLink = socialLinks.find((link) => link.label === "GitHub");
 const linkedInLink = socialLinks.find((link) => link.label === "LinkedIn");
-
-const emailHandle = emailLink?.handle ?? "";
-const [emailUser = "", emailDomain = ""] = emailHandle.split("@");
-
-const cvHref = documents.cvHref ?? "";
-const cvKey = Array.from(cvHref)
-  .map((character, index) => character.charCodeAt(0) + 11 + (index % 4))
+const emailHref = emailLink?.href ?? "";
+const cvKey = Array.from(documents.cvHref)
+  .map((character, index) => character.charCodeAt(0) + 17 + (index % 7))
   .join(".");
-const normalizedPublicKey = documents.cvPgpPublicKey.replace(/\s+/g, "").toUpperCase();
-const normalizedFingerprint = documents.cvPgpFingerprint.replace(/\s+/g, "").toUpperCase();
+const verificationPayload = [
+  `SHA-256: ${documents.cvSha256}`,
+  `PGP fingerprint: ${documents.cvPgpFingerprint}`,
+].join("\n");
 ---
 
 <section class="recruiter-access" data-reveal>
   <div class="access-shell surface">
     <div class="access-intro">
       <span class="kicker">Kontakt</span>
+      <h3>Kontakt bez zbytečného tření.</h3>
       <p class="lede">
-        LinkedIn a GitHub nechávám otevřené. E-mail zobrazím po kliknutí a CV lze otevřít
-        vložením veřejného PGP klíče nebo fingerprintu uvedeného ve footeru.
+        CV otevřu po kliknutí. E-mail je viditelný, profily jsou hned po ruce
+        a u CV nechávám i jednoduchý otisk pro ověření souboru.
       </p>
       <AvailabilityBadge status={availability.status} note={availability.note} />
     </div>
 
-    <div class="actions" aria-label="Kontakty">
-      <button
-        class="access-card primary"
-        type="button"
-        data-reveal-email
-        data-email-user={emailUser}
-        data-email-domain={emailDomain}
-      >
-        <span>E-mail</span>
-        <strong data-email-label>Zobrazit a otevřít</strong>
-      </button>
+    <div class="actions" aria-label="Kontakty a dokumenty">
+      {documents.cvHref && (
+        <button class="access-card primary" type="button" data-open-cv data-cv-key={cvKey}>
+          <span>{documents.cvLabel}</span>
+          <strong>{documents.cvNote}</strong>
+        </button>
+      )}
+
+      {emailHref && (
+        <a class="access-card" href={emailHref} data-email-link>
+          <span>E-mail</span>
+          <strong>{emailLink?.handle}</strong>
+        </a>
+      )}
 
       {linkedInLink && (
         <a class="access-card" href={linkedInLink.href} target="_blank" rel="noreferrer">
@@ -56,127 +58,80 @@ const normalizedFingerprint = documents.cvPgpFingerprint.replace(/\s+/g, "").toU
       )}
     </div>
 
-    <div class="cv-gate">
-      <div class="gate-copy">
-        <span class="kicker">CV</span>
-        <p>
-          Pro otevření CV vlož veřejný PGP klíč nebo fingerprint z footeru.
-        </p>
+    <details class="integrity-panel">
+      <summary>
+        <span>Ověření integrity CV</span>
+        <strong>SHA-256 + PGP fingerprint</strong>
+      </summary>
+      <div class="integrity-body">
+        <dl>
+          <div>
+            <dt>SHA-256</dt>
+            <dd>{documents.cvSha256}</dd>
+          </div>
+          <div>
+            <dt>PGP fingerprint</dt>
+            <dd>{documents.cvPgpFingerprint}</dd>
+          </div>
+        </dl>
+        <code hidden data-verification-value>{verificationPayload}</code>
+        <button type="button" data-copy-verification>
+          Kopírovat ověřovací údaje
+        </button>
       </div>
-
-      <div class="gate-controls">
-        <label class="gate-field">
-          <span>Veřejný PGP klíč nebo fingerprint</span>
-          <textarea
-            rows="5"
-            spellcheck="false"
-            autocomplete="off"
-            placeholder="-----BEGIN PGP PUBLIC KEY BLOCK----- ... nebo fingerprint"
-            data-cv-pgp-input
-          ></textarea>
-        </label>
-
-        <div class="gate-actions">
-          <button
-            class="button button-primary gate-button"
-            type="button"
-            data-open-cv
-            data-cv-key={cvKey}
-            data-pgp-key={normalizedPublicKey}
-            data-pgp-fingerprint={normalizedFingerprint}
-            disabled={!documents.cvHref}
-          >
-            Otevřít CV
-          </button>
-        </div>
-      </div>
-
-      <p class="gate-status" data-cv-status>
-        Veřejný klíč i fingerprint jsou dostupné ve footeru.
-      </p>
-    </div>
+    </details>
   </div>
 </section>
 
 <script>
-  function initRecruiterAccess() {
-    const root = document.querySelector(".recruiter-access");
-    if (!root || root.dataset.bound === "true") return;
-    root.dataset.bound = "true";
-
-    const emailButton = root.querySelector("[data-reveal-email]");
-    const emailLabel = root.querySelector("[data-email-label]");
-    const cvButton = root.querySelector("[data-open-cv]");
-    const pgpInput = root.querySelector("[data-cv-pgp-input]");
-    const statusLine = root.querySelector("[data-cv-status]");
-
-    const updateStatus = (message, tone = "muted") => {
-      if (!(statusLine instanceof HTMLElement)) return;
-      statusLine.textContent = message;
-      statusLine.dataset.tone = tone;
-    };
-
-    const decodeDirectPath = (key) =>
-      key
-        .split(".")
-        .filter(Boolean)
-        .map((value, index) => String.fromCharCode(Number(value) - 11 - (index % 4)))
-        .join("");
-
-    const normalize = (value) => value.replace(/\s+/g, "").toUpperCase();
-
-    if (emailButton instanceof HTMLButtonElement) {
-      emailButton.addEventListener("click", async () => {
-        const user = emailButton.dataset.emailUser ?? "";
-        const domain = emailButton.dataset.emailDomain ?? "";
-        const address = [user, domain].filter(Boolean).join("@");
-        if (!address) return;
-
-        if (emailLabel) {
-          emailLabel.textContent = address;
-        }
-
-        try {
-          await navigator.clipboard.writeText(address);
-        } catch {}
-
-        window.location.href = `mailto:${address}`;
-      });
-    }
-
-    if (
-      cvButton instanceof HTMLButtonElement &&
-      pgpInput instanceof HTMLTextAreaElement
-    ) {
-      cvButton.addEventListener("click", () => {
-        const candidate = normalize(pgpInput.value.trim());
-        const allowedKey = cvButton.dataset.pgpKey ?? "";
-        const allowedFingerprint = cvButton.dataset.pgpFingerprint ?? "";
-
-        if (!candidate) {
-          updateStatus("Vlož veřejný PGP klíč nebo fingerprint z footeru.", "error");
-          return;
-        }
-
-        if (candidate !== allowedKey && candidate !== allowedFingerprint) {
-          updateStatus("Klíč nebo fingerprint nesedí.", "error");
-          return;
-        }
-
-        const path = decodeDirectPath(cvButton.dataset.cvKey ?? "");
-        if (!path) {
-          updateStatus("CV momentálně není dostupné.", "error");
-          return;
-        }
-
-        window.open(path, "_blank", "noopener,noreferrer");
-        updateStatus("CV odemčeno. Otevírám dokument.", "success");
-      });
-    }
+  function decodePath(key) {
+    return key
+      .split(".")
+      .filter(Boolean)
+      .map((value, index) => String.fromCharCode(Number(value) - 17 - (index % 7)))
+      .join("");
   }
 
-  initRecruiterAccess();
-  document.addEventListener("astro:page-load", initRecruiterAccess);
+  function initCvOpen() {
+    document.querySelectorAll("[data-open-cv]").forEach((button) => {
+      if (!(button instanceof HTMLButtonElement) || button.dataset.cvBound === "true") return;
+      button.dataset.cvBound = "true";
+
+      button.addEventListener("click", () => {
+        const path = decodePath(button.dataset.cvKey ?? "");
+        if (!path) return;
+        window.open(path, "_blank", "noopener,noreferrer");
+      });
+    });
+  }
+
+  function initCvIntegrityCopy() {
+    document.querySelectorAll("[data-copy-verification]").forEach((button) => {
+      if (!(button instanceof HTMLButtonElement) || button.dataset.bound === "true") return;
+      button.dataset.bound = "true";
+
+      button.addEventListener("click", async () => {
+        const originalLabel = button.textContent ?? "Kopírovat ověřovací údaje";
+        const value = button.parentElement?.querySelector("[data-verification-value]")?.textContent ?? "";
+
+        try {
+          await navigator.clipboard.writeText(value);
+          button.textContent = "Zkopírováno";
+        } catch {
+          button.textContent = "Kopírování selhalo";
+        }
+
+        window.setTimeout(() => {
+          button.textContent = originalLabel;
+        }, 1600);
+      });
+    });
+  }
+
+  initCvOpen();
+  initCvIntegrityCopy();
+  document.addEventListener("astro:page-load", initCvOpen);
+  document.addEventListener("astro:page-load", initCvIntegrityCopy);
 </script>
 
 <style>
@@ -186,162 +141,178 @@ const normalizedFingerprint = documents.cvPgpFingerprint.replace(/\s+/g, "").toU
 
   .access-shell {
     display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
     gap: 1rem;
-    padding: 1.1rem;
+    padding: 1.15rem;
   }
 
   .access-intro {
     display: grid;
-    gap: 0.95rem;
+    gap: 0.85rem;
     align-content: start;
     padding-right: 0.4rem;
   }
 
+  .access-intro h3 {
+    margin: 0;
+    font-family: var(--font-display);
+    font-size: clamp(1.8rem, 3vw, 2.45rem);
+    line-height: 1;
+    letter-spacing: 0;
+  }
+
   .actions {
     display: grid;
-    grid-template-columns: minmax(0, 1fr);
-    gap: 0;
-    border-left: 1px solid rgba(255, 255, 255, 0.08);
-    padding-left: 1rem;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 0.8rem;
   }
 
   .access-card {
-    min-height: 5rem;
+    min-height: 8rem;
     display: grid;
-    grid-template-columns: minmax(84px, 96px) minmax(0, 1fr);
+    align-content: space-between;
     gap: 0.9rem;
-    align-items: center;
-    padding: 0.95rem 0;
-    border: 0;
-    border-top: 1px solid rgba(255, 255, 255, 0.08);
-    background: transparent;
+    padding: 1rem;
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    background: rgba(255, 255, 255, 0.025);
     color: var(--color-text);
     text-align: left;
+    cursor: pointer;
     transition:
       transform var(--duration-fast) var(--easing),
-      color var(--duration-fast) var(--easing);
+      border-color var(--duration-fast) var(--easing),
+      background-color var(--duration-fast) var(--easing);
   }
 
-  .access-card:first-child {
-    border-top: 0;
-    padding-top: 0;
+  .access-card.primary {
+    border-color: rgba(245, 209, 13, 0.35);
+    background: rgba(245, 209, 13, 0.09);
   }
 
   .access-card:hover,
   .access-card:focus-visible {
-    transform: translateX(2px);
-    color: var(--color-accent);
+    transform: translateY(-2px);
+    border-color: rgba(245, 209, 13, 0.32);
+    background: rgba(245, 209, 13, 0.065);
   }
 
   .access-card span {
     font-family: var(--font-mono);
-    font-size: 0.74rem;
+    font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.1em;
     color: var(--color-text-soft);
   }
 
   .access-card strong {
-    font-size: 1rem;
-    line-height: 1.35;
+    font-size: 1.05rem;
+    line-height: 1.25;
   }
 
-  .cv-gate {
+  .integrity-panel {
     grid-column: 1 / -1;
-    display: grid;
-    grid-template-columns: minmax(0, 0.8fr) minmax(0, 1.2fr);
-    gap: 1rem;
     padding-top: 1rem;
     border-top: 1px solid rgba(255, 255, 255, 0.08);
   }
 
-  .gate-copy {
+  .integrity-panel summary {
     display: grid;
-    gap: 0.55rem;
+    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    gap: 1rem;
+    align-items: center;
+    cursor: pointer;
+    list-style: none;
   }
 
-  .gate-copy p,
-  .gate-status {
-    margin: 0;
-    color: var(--color-text-muted);
+  .integrity-panel summary::-webkit-details-marker {
+    display: none;
   }
 
-  .gate-controls {
-    display: grid;
-    gap: 0.85rem;
-  }
-
-  .gate-field {
-    display: grid;
-    gap: 0.35rem;
-  }
-
-  .gate-field span {
+  .integrity-panel summary span,
+  .integrity-body dt,
+  .integrity-body button {
     font-family: var(--font-mono);
     font-size: 0.72rem;
     text-transform: uppercase;
     letter-spacing: 0.08em;
-    color: var(--color-text-soft);
   }
 
-  .gate-field textarea {
-    min-height: 9rem;
-    padding: 0.8rem 0.9rem;
-    border: 1px solid rgba(255, 255, 255, 0.1);
-    border-radius: var(--radius-sm);
-    background: rgba(255, 255, 255, 0.02);
-    color: var(--color-text);
-    resize: vertical;
-    font-family: var(--font-mono);
-    line-height: 1.45;
-  }
-
-  .gate-actions {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.75rem;
-  }
-
-  .gate-button {
-    min-width: 12rem;
-  }
-
-  .gate-status {
-    grid-column: 1 / -1;
-  }
-
-  .gate-status[data-tone="success"] {
+  .integrity-panel summary span {
     color: var(--color-accent);
   }
 
-  .gate-status[data-tone="error"] {
-    color: #ff8b8b;
+  .integrity-panel summary strong {
+    color: var(--color-text-muted);
+    font-weight: 600;
+  }
+
+  .integrity-body {
+    display: grid;
+    gap: 0.85rem;
+    margin-top: 0.9rem;
+    padding-top: 0.9rem;
+    border-top: 1px solid rgba(255, 255, 255, 0.08);
+  }
+
+  .integrity-body dl {
+    display: grid;
+    gap: 0.7rem;
+    margin: 0;
+  }
+
+  .integrity-body div {
+    display: grid;
+    grid-template-columns: minmax(130px, 0.28fr) minmax(0, 1fr);
+    gap: 0.8rem;
+  }
+
+  .integrity-body dt {
+    color: var(--color-text-soft);
+  }
+
+  .integrity-body dd {
+    margin: 0;
+    color: var(--color-text-muted);
+    font-family: var(--font-mono);
+    font-size: 0.78rem;
+    overflow-wrap: anywhere;
+  }
+
+  .integrity-body button {
+    justify-self: start;
+    min-height: 2.35rem;
+    padding: 0.55rem 0.72rem;
+    border: 1px solid rgba(245, 209, 13, 0.22);
+    background: rgba(255, 255, 255, 0.02);
+    color: var(--color-text);
+    cursor: pointer;
+  }
+
+  .integrity-body button:hover,
+  .integrity-body button:focus-visible {
+    color: var(--color-accent);
+    border-color: rgba(245, 209, 13, 0.34);
   }
 
   @media (max-width: 860px) {
-    .access-shell,
-    .cv-gate {
+    .access-shell {
       grid-template-columns: 1fr;
-    }
-
-    .actions {
-      border-left: 0;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      padding-left: 0;
-      padding-top: 0.8rem;
     }
   }
 
   @media (max-width: 620px) {
-    .access-card {
+    .actions {
       grid-template-columns: 1fr;
-      gap: 0.25rem;
     }
 
-    .gate-button {
-      min-width: 0;
-      width: 100%;
+    .access-card {
+      min-height: 6.6rem;
+    }
+
+    .integrity-panel summary,
+    .integrity-body div {
+      grid-template-columns: 1fr;
+      gap: 0.25rem;
     }
   }
 </style>

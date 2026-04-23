@@ -4,8 +4,8 @@ export const projectCategoryOrder = ["freelance", "work", "personal"] as const;
 
 export const projectCategoryMeta = {
   freelance: {
-    label: "Freelance web dev",
-    title: "Freelance web development",
+    label: "Klientský projekt",
+    title: "Klientské projekty",
     description:
       "Zakázkové weby, landing pages a menší klientské projekty se zaměřením na přehlednost, výkon a čisté provedení.",
   },
@@ -19,7 +19,7 @@ export const projectCategoryMeta = {
     label: "Osobní",
     title: "Osobní a studijní projekty",
     description:
-      "Vlastní projekty, na kterých rozvíjím frontend, bezpečnostní myšlení a technický základ mimo každodenní pracovní kontext.",
+      "Vlastní projekty, na kterých rozvíjím bezpečnostní myšlení, systémový základ, práci s daty a webovou implementaci.",
   },
 } as const;
 
