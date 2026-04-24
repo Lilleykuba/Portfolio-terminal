@@ -9,7 +9,7 @@ export type SocialLink = {
 export const socialLinks: SocialLink[] = [
   {
     label: "GitHub",
-    href: "https://github.com/Lilleykuba",
+    href: "https://github.com/AgoraPool",
     handle: "GitHub profil",
     external: true,
     available: true,

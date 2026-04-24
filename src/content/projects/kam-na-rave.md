@@ -23,7 +23,7 @@ role: "Koncept, UI, backend, databáze, šifrování, nasazení"
 featured: true
 year: 2026
 status: "V aktivním vývoji"
-github: "https://github.com/Lilleykuba/RaveMap"
+github: "https://github.com/AgoraPool/RaveMap"
 demo: "https://kamnarave.netlify.app"
 order: 1
 tags:

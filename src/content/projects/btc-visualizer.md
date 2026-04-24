@@ -23,7 +23,7 @@ role: "Návrh produktu, datová integrace, UI, nasazení"
 featured: true
 year: 2026
 status: "V aktivním vývoji"
-github: "https://github.com/Lilleykuba/BTC-Visualizer"
+github: "https://github.com/AgoraPool/BTC-Visualizer"
 demo: "https://btc-visualizer.netlify.app"
 order: 2
 tags:
