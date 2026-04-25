@@ -45,14 +45,14 @@ export const profile = {
   focusCards: [
     {
       title: "Bezpečnost a provoz mě zajímají prakticky",
-      text: "Učím se přes vlastní projekty: self-hosted server, VPN, DNS filtering, validace vstupů, šifrování a opatrnější práci s daty.",
+      text: "Učím se přes vlastní projekty: self-hosted server, VPN, DNS filtering, validace vstupů, šifrování a opatrná práce s daty.",
     },
     {
       title: "Umím přemýšlet v systémech",
       text: "HRIT a SAP SuccessFactors mi daly zkušenost s požadavky, testováním, risk schválením a změnami, které musí fungovat i po nasazení.",
     },
     {
-      title: "Web je jeden z důkazů, ne celá škatulka",
+      title: "Webové technologie mě baví",
       text: "Webové projekty používám k ukázání struktury, práce s daty, nasazení a schopnosti dotáhnout věc do použitelného stavu.",
     },
   ],
