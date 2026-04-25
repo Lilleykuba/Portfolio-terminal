@@ -9,7 +9,7 @@ export const profile = {
     tail: "systémy a technický web",
   },
   intro:
-    "Zajímá mě bezpečnost, Linux, networking, provoz systémů a praktická webová implementace. Z HRIT/SAP SuccessFactors si nesu cit pro procesy, data a uživatele. Hledám junior roli v Brně nebo remote v Česku: cybersecurity, SOC, sysadmin, networking, HRIT nebo technický web.",
+    "Zajímá mě bezpečnost, Linux, networking, provoz systémů a praktická webová implementace. Z HRIT/SAP SuccessFactors si nesu cit pro procesy, data a uživatele. Hledám junior roli v Brně nebo remote v Česku: cybersecurity, SOC, sysadmin, networking, HRIT nebo web dev.",
   primaryCta: {
     label: "Zobrazit projekty",
     href: "/#projects",
